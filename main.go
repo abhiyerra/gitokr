@@ -2,20 +2,19 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
 
 type GitsopConfig map[string]struct {
-	Assignee    string `json:"assignee"`
-	PullRequest string `json:"pullRequest"`
-	FileName    string `json:"fileName"`
-	OutputDir   string `json:"outputDir"`
+	Assignee  string `json:"assignee"`
+	FileName  string `json:"fileName"`
+	OutputDir string `json:"outputDir"`
 }
 
 // gitsop
@@ -31,6 +30,8 @@ func main() {
 		githubOwner       string
 		githubRepo        string
 		githubAccessToken string
+
+		config GitsopConfig
 	)
 
 	flag.StringVar(&githubRepo, "github-repo", "", "Github Repo. Ex. gitsop")
@@ -40,48 +41,90 @@ func main() {
 
 	ctx, client := githubAuth(githubAccessToken)
 
-	// list all repositories for the authenticated user
-	repo, _, err := client.Repositories.Get(ctx, githubOwner, githubRepo)
+	repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, "gitsop.json", nil)
 	if err != nil {
 		log.Fatal("Error", err)
 	}
 
-	_, err := git.PlainClone("/tmp/foo", false, &git.CloneOptions{
-		URL:      "https://github.com/src-d/go-git",
-		Progress: os.Stdout,
-	})
-
-	fileContent := []byte("This is the content of my file\nand the 2nd line of it")
-
-	// Note: the file needs to be absent from the repository as you are not
-	// specifying a SHA reference here.
-	opts := &github.RepositoryContentFileOptions{
-		Message:   github.String("This is my commit message"),
-		Content:   fileContent,
-		Branch:    github.String("master"),
-		Committer: &github.CommitAuthor{Name: github.String("FirstName LastName"), Email: github.String("user@example.com")},
-	}
-	_, _, err := client.Repositories.CreateFile(ctx, "myOrganization", "myRepository", "myNewFile.md", opts)
+	repoInfo, _, err := client.Repositories.Get(ctx, githubOwner, githubRepo)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal("Error", err)
 	}
 
-	newPR := &github.NewPullRequest{
-		Title:               github.String("My awesome pull request"),
-		Head:                github.String("branch_to_merge"),
-		Base:                github.String("master"),
-		Body:                github.String("This is the description of the PR created with the package `github.com/google/go-github/github`"),
-		MaintainerCanModify: github.Bool(true),
-	}
-
-	pr, _, err := client.PullRequests.Create(context.Background(), "myOrganization", "myRepository", newPR)
+	repoConfigContent, err := repoConfig.GetContent()
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal("Error", err)
+	}
+	log.Println(repoConfigContent)
+
+	err = json.Unmarshal([]byte(repoConfigContent), &config)
+	if err != nil {
+		log.Fatal("Error", err)
+	}
+	log.Println(config)
+
+	for k, v := range config {
+		log.Println(k)
+
+		log.Println(repoInfo.GetMasterBranch())
+		// Create Branch
+
+		branch, _, err := client.Repositories.GetBranch(ctx, githubOwner, githubRepo, "master")
+		if err != nil {
+			log.Fatal("Error", err)
+		}
+
+		_, _, err = client.Git.CreateRef(ctx, githubOwner, githubRepo, &github.Reference{
+			Ref: github.String("refs/heads/foobar"),
+			Object: &github.GitObject{
+				SHA: branch.Commit.SHA,
+			},
+		})
+		if err != nil {
+			log.Fatal("Error", err)
+		}
+
+		repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, v.FileName, nil)
+		if err != nil {
+			log.Fatal("Error", err)
+		}
+
+		fileContent, err := repoConfig.GetContent()
+		if err != nil {
+			log.Fatal("Error", err)
+		}
+		log.Println(fileContent)
+
+		opts := &github.RepositoryContentFileOptions{
+			Message: github.String("This is my commit message"),
+			Content: []byte(fileContent),
+			Branch:  github.String("foobar"),
+			Committer: &github.CommitAuthor{
+				Name:  github.String("FirstName LastName"),
+				Email: github.String("user@example.com")},
+		}
+		_, _, err = client.Repositories.CreateFile(ctx, githubOwner, githubRepo, "foobar.md", opts)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		newPR := &github.NewPullRequest{
+			Title:               github.String("My awesome pull request"),
+			Head:                github.String("foobar"),
+			Base:                github.String("master"),
+			Body:                github.String("This is the description of the PR created with the package `github.com/google/go-github/github`"),
+			MaintainerCanModify: github.Bool(true),
+		}
+
+		pr, _, err := client.PullRequests.Create(ctx, githubOwner, githubRepo, newPR)
+		if err != nil {
+			log.Fatal("Error", err)
+		}
+
+		log.Printf("PR created: %s\n", pr.GetHTMLURL())
 	}
 
-	fmt.Printf("PR created: %s\n", pr.GetHTMLURL())
 }
 
 func githubAuth(githubAccessToken string) (context.Context, *github.Client) {

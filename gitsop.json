@@ -1,7 +1,6 @@
 {
     "* * * * *": {
         "assignee": "abhiyerra",
-        "pullRequest": true,
         "fileName": "docs/DAILY_TODO.md",
         "outputDir": "tasks/"
     }
