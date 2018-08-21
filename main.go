@@ -129,7 +129,7 @@ func main() {
 				Title:               github.String(fmt.Sprintf("%s: %s", timeNow, task.PullRequestTitle)),
 				Head:                github.String(branchName),
 				Base:                github.String("master"),
-				Body:                github.String(config.Instructions),
+				Body:                github.String(task.Instructions),
 				MaintainerCanModify: github.Bool(true),
 			}
 
