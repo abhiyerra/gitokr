@@ -2,8 +2,8 @@
     {
         "cron": "* * * * *",
         "assignee": "abhiyerra",
-        "fileName": "docs/DAILY_TODO.md",
-        "outputDir": "tasks/",
+        "fileName": "sops/DAILY_TODO.md",
+        "outputDir": "sops/output",
         "pullRequestTitle": "Daily Todo"
     }
 ]
