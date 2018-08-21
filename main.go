@@ -16,7 +16,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type GitSOPConfig map[string]struct {
+type GitSOPConfig []struct {
+	Cron      string `json:"cron"`
 	Assignee  string `json:"assignee"`
 	FileName  string `json:"fileName"`
 	OutputDir string `json:"outputDir"`
@@ -24,12 +25,6 @@ type GitSOPConfig map[string]struct {
 	PullRequestTitle string `json:"pullRequestTitle"`
 }
 
-// gitsop
-
-// - Look for cronjobs in the file. https://godoc.org/github.com/robfig/cron#Schedule
-// 	- If it is the next time to run then copy the file and create a run file on a branch.
-
-// - gitsop filename/foobar
 func main() {
 	var (
 		githubOwner       string
@@ -70,20 +65,20 @@ func main() {
 	}
 	log.Println(config)
 
-	for k, v := range config {
+	for _, task := range config {
 		var (
 			timeNow    = time.Now().UTC().Format(time.RFC3339)
 			branchName = namesgenerator.GetRandomName(1)
 		)
 
-		schedule, err := cron.Parse(k)
+		schedule, err := cron.Parse(task.Cron)
 		if err != nil {
 			log.Fatal("Error", err)
 		}
 
 		if schedule.Next(time.Now()).After(time.Now()) {
 
-			log.Println(k)
+			log.Println(task)
 
 			log.Println(repoInfo.GetMasterBranch())
 			// Create Branch
@@ -103,7 +98,7 @@ func main() {
 				log.Fatal("Error", err)
 			}
 
-			repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, v.FileName, nil)
+			repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, task.FileName, nil)
 			if err != nil {
 				log.Fatal("Error", err)
 			}
@@ -115,7 +110,7 @@ func main() {
 			log.Println(fileContent)
 
 			opts := &github.RepositoryContentFileOptions{
-				Message: github.String(fmt.Sprintf("%s: %s", timeNow, v.PullRequestTitle)),
+				Message: github.String(fmt.Sprintf("%s: %s", timeNow, task.PullRequestTitle)),
 				Content: []byte(fileContent),
 				Branch:  github.String(branchName),
 				Committer: &github.CommitAuthor{
@@ -123,14 +118,14 @@ func main() {
 					Email: github.String("user@example.com"),
 				},
 			}
-			_, _, err = client.Repositories.CreateFile(ctx, githubOwner, githubRepo, filepath.Join(v.OutputDir, timeNow, v.FileName), opts)
+			_, _, err = client.Repositories.CreateFile(ctx, githubOwner, githubRepo, filepath.Join(task.OutputDir, timeNow, task.FileName), opts)
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
 
 			newPR := &github.NewPullRequest{
-				Title:               github.String(fmt.Sprintf("%s: %s", timeNow, v.PullRequestTitle)),
+				Title:               github.String(fmt.Sprintf("%s: %s", timeNow, task.PullRequestTitle)),
 				Head:                github.String(branchName),
 				Base:                github.String("master"),
 				Body:                github.String("This is the description of the PR created with the package `github.com/google/go-github/github`"),

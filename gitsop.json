@@ -1,8 +1,9 @@
-{
-    "* * * * *": {
+[
+    {
+        "cron": "* * * * *",
         "assignee": "abhiyerra",
         "fileName": "docs/DAILY_TODO.md",
         "outputDir": "tasks/",
         "pullRequestTitle": "Daily Todo"
     }
-}
+]
