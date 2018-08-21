@@ -4,7 +4,7 @@
         "assignee": "abhiyerra",
         "fileName": "sops/DAILY_TODO.md",
         "outputDir": "sops/output",
-        "pullRequestTitle": "Daily Todo"
+        "pullRequestTitle": "Daily Todo",
         "instructionns": "Do this entire checklist everyday and merge it into the master branch."
     }
 ]
