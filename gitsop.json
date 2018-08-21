@@ -6,7 +6,7 @@
             "sops/DAILY_TODO.md"
         ],
         "outputDir": "sops/output",
-        "pullRequestTitle": "Daily Todo",
+        "title": "Daily Todo",
         "instructions": "Do this entire checklist everyday and merge it into the master branch."
     }
 ]

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"flag"
@@ -8,6 +9,7 @@ import (
 	"log"
 	"math/rand"
 	"path/filepath"
+	"text/template"
 	"time"
 
 	"github.com/docker/docker/pkg/namesgenerator"
@@ -16,14 +18,27 @@ import (
 	"golang.org/x/oauth2"
 )
 
+const (
+	HumanInputType   = "human"
+	CommandInputType = "command"
+)
+
+type Input struct {
+	Type    string `json:"type"`
+	Value   string `json:"value"`
+	Command string `json:"command"`
+}
+
 type GitSOPConfig []struct {
 	Cron      string   `json:"cron"`
 	Assignee  string   `json:"assignee"`
 	Files     []string `json:"files"`
 	OutputDir string   `json:"outputDir"`
 
-	PullRequestTitle string `json:"pullRequestTitle"`
-	Instructions     string `json:"instructions"`
+	Title        string `json:"title"`
+	Instructions string `json:"instructions"`
+
+	Inputs map[string]Input `json:"inputs"`
 }
 
 func main() {
@@ -117,9 +132,14 @@ func main() {
 				}
 				log.Println(fileContent)
 
+				var fileContentBytes bytes.Buffer
+
+				t := template.Must(template.New("t1").Parse(fileContent))
+				t.Execute(&fileContentBytes, task.Inputs)
+
 				opts := &github.RepositoryContentFileOptions{
-					Message: github.String(fmt.Sprintf("%s: %s", timeNow, task.PullRequestTitle)),
-					Content: []byte(fileContent),
+					Message: github.String(fmt.Sprintf("%s: %s", timeNow, task.Title)),
+					Content: fileContentBytes.Bytes(),
 					Branch:  github.String(branchName),
 					Committer: &github.CommitAuthor{
 						Name:  github.String("GitSOP"),
@@ -134,7 +154,7 @@ func main() {
 			}
 
 			newPR := &github.NewPullRequest{
-				Title:               github.String(fmt.Sprintf("%s: %s", timeNow, task.PullRequestTitle)),
+				Title:               github.String(fmt.Sprintf("%s: %s", timeNow, task.Title)),
 				Head:                github.String(branchName),
 				Base:                github.String("master"),
 				Body:                github.String(task.Instructions),
