@@ -23,6 +23,7 @@ type GitSOPConfig []struct {
 	OutputDir string `json:"outputDir"`
 
 	PullRequestTitle string `json:"pullRequestTitle"`
+	Instructions     string `json:"instructions"`
 }
 
 func main() {
@@ -114,8 +115,8 @@ func main() {
 				Content: []byte(fileContent),
 				Branch:  github.String(branchName),
 				Committer: &github.CommitAuthor{
-					Name:  github.String("FirstName LastName"),
-					Email: github.String("user@example.com"),
+					Name:  github.String("GitSOP"),
+					Email: github.String("bot@gitsop.com"),
 				},
 			}
 			_, _, err = client.Repositories.CreateFile(ctx, githubOwner, githubRepo, filepath.Join(task.OutputDir, timeNow, task.FileName), opts)
@@ -128,7 +129,7 @@ func main() {
 				Title:               github.String(fmt.Sprintf("%s: %s", timeNow, task.PullRequestTitle)),
 				Head:                github.String(branchName),
 				Base:                github.String("master"),
-				Body:                github.String("This is the description of the PR created with the package `github.com/google/go-github/github`"),
+				Body:                github.String(config.Instructions),
 				MaintainerCanModify: github.Bool(true),
 			}
 
