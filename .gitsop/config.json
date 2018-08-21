@@ -1,12 +1,11 @@
-[
-    {
+{
+    "Daily Todo": {
         "cron": "* * * * *",
         "assignee": "abhiyerra",
         "files": [
             "sops/DAILY_TODO.md"
         ],
         "outputDir": "sops/output",
-        "title": "Daily Todo",
         "instructions": "Do this entire checklist everyday and merge it into the master branch."
     }
-]
+}
