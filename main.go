@@ -17,10 +17,10 @@ import (
 )
 
 type GitSOPConfig []struct {
-	Cron      string `json:"cron"`
-	Assignee  string `json:"assignee"`
-	FileName  string `json:"fileName"`
-	OutputDir string `json:"outputDir"`
+	Cron      string   `json:"cron"`
+	Assignee  string   `json:"assignee"`
+	Files     []string `json:"files"`
+	OutputDir string   `json:"outputDir"`
 
 	PullRequestTitle string `json:"pullRequestTitle"`
 	Instructions     string `json:"instructions"`
@@ -40,7 +40,7 @@ func main() {
 	flag.StringVar(&githubAccessToken, "github-access-token", "", "Github Access Token")
 	flag.Parse()
 
-	rand.Seed(1337)
+	rand.Seed(time.Now().UTC().UnixNano())
 
 	ctx, client := githubAuth(githubAccessToken)
 
@@ -72,6 +72,12 @@ func main() {
 			branchName = namesgenerator.GetRandomName(1)
 		)
 
+		log.Println("Branch", branchName)
+
+		if task.Cron == "" {
+			continue
+		}
+
 		schedule, err := cron.Parse(task.Cron)
 		if err != nil {
 			log.Fatal("Error", err)
@@ -99,30 +105,32 @@ func main() {
 				log.Fatal("Error", err)
 			}
 
-			repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, task.FileName, nil)
-			if err != nil {
-				log.Fatal("Error", err)
-			}
+			for _, fileName := range task.Files {
+				repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, fileName, nil)
+				if err != nil {
+					log.Fatal("Error", err)
+				}
 
-			fileContent, err := repoConfig.GetContent()
-			if err != nil {
-				log.Fatal("Error", err)
-			}
-			log.Println(fileContent)
+				fileContent, err := repoConfig.GetContent()
+				if err != nil {
+					log.Fatal("Error", err)
+				}
+				log.Println(fileContent)
 
-			opts := &github.RepositoryContentFileOptions{
-				Message: github.String(fmt.Sprintf("%s: %s", timeNow, task.PullRequestTitle)),
-				Content: []byte(fileContent),
-				Branch:  github.String(branchName),
-				Committer: &github.CommitAuthor{
-					Name:  github.String("GitSOP"),
-					Email: github.String("bot@gitsop.com"),
-				},
-			}
-			_, _, err = client.Repositories.CreateFile(ctx, githubOwner, githubRepo, filepath.Join(task.OutputDir, timeNow, task.FileName), opts)
-			if err != nil {
-				fmt.Println(err)
-				return
+				opts := &github.RepositoryContentFileOptions{
+					Message: github.String(fmt.Sprintf("%s: %s", timeNow, task.PullRequestTitle)),
+					Content: []byte(fileContent),
+					Branch:  github.String(branchName),
+					Committer: &github.CommitAuthor{
+						Name:  github.String("GitSOP"),
+						Email: github.String("bot@gitsop.com"),
+					},
+				}
+				_, _, err = client.Repositories.CreateFile(ctx, githubOwner, githubRepo, filepath.Join(task.OutputDir, timeNow, fileName), opts)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 
 			newPR := &github.NewPullRequest{
