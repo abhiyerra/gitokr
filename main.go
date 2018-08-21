@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log"
 	"math/rand"
@@ -15,6 +14,7 @@ import (
 	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/google/go-github/github"
 	"github.com/robfig/cron"
+	flag "github.com/spf13/pflag"
 	"golang.org/x/oauth2"
 )
 
@@ -48,6 +48,16 @@ var (
 	githubAccessToken string
 )
 
+func githubAuth(githubAccessToken string) (context.Context, *github.Client) {
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: githubAccessToken},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+
+	return ctx, github.NewClient(tc)
+}
+
 func repoConfig(ctx context.Context, client *github.Client) (config GitSOPConfig, repoInfo *github.Repository) {
 	repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, ".gitsop/config.json", nil)
 	if err != nil {
@@ -74,7 +84,7 @@ func repoConfig(ctx context.Context, client *github.Client) (config GitSOPConfig
 	return config, repoInfo
 }
 
-func createTask(ctx context.Context, config GitSOPConfig, client *github.Client, repoInfo *github.Repository, title string, task Task) {
+func createTask(ctx context.Context, config GitSOPConfig, client *github.Client, repoInfo *github.Repository, title string, task Task, taskInputs map[string]string) {
 	branchName := namesgenerator.GetRandomName(1)
 	timeNow := time.Now().UTC().Format(time.RFC3339)
 
@@ -113,6 +123,14 @@ func createTask(ctx context.Context, config GitSOPConfig, client *github.Client,
 		log.Println(fileContent)
 
 		var fileContentBytes bytes.Buffer
+
+		for inputName, input := range taskInputs {
+			t, ok := task.Inputs[inputName]
+			if ok {
+				t.Value = input
+				task.Inputs[inputName] = t
+			}
+		}
 
 		t := template.Must(template.New("t1").Parse(fileContent))
 		t.Execute(&fileContentBytes, task.Inputs)
@@ -170,7 +188,7 @@ func crons() {
 
 			nextRun, ok := nextRuns[title]
 			if !ok || schedule.Next(time.Now()).After(nextRun) {
-				createTask(ctx, config, client, repoInfo, title, task)
+				createTask(ctx, config, client, repoInfo, title, task, nil)
 				nextRuns[title] = schedule.Next(time.Now())
 			}
 		}
@@ -179,7 +197,8 @@ func crons() {
 	}
 }
 
-func runTask(taskName string) {
+func runTask(taskName string, taskInputs map[string]string) {
+	log.Println(taskInputs)
 	ctx, client := githubAuth(githubAccessToken)
 	config, repoInfo := repoConfig(ctx, client)
 
@@ -188,33 +207,27 @@ func runTask(taskName string) {
 		log.Fatal(taskName, "doesn't exist.")
 	}
 
-	createTask(ctx, config, client, repoInfo, taskName, task)
+	createTask(ctx, config, client, repoInfo, taskName, task, taskInputs)
 }
 
 func main() {
-	var runTaskName string
+	var (
+		taskName   string
+		taskInputs map[string]string
+	)
 
 	flag.StringVar(&githubRepo, "github-repo", "", "Github Repo. Ex. gitsop")
 	flag.StringVar(&githubOwner, "github-owner", "", "Github Owner. Ex. abhiyerra")
 	flag.StringVar(&githubAccessToken, "github-access-token", "", "Github Access Token")
-	flag.StringVar(&runTaskName, "task", "", "The task to run.")
+	flag.StringVar(&taskName, "task", "", "The task to run.")
+	flag.StringToStringVar(&taskInputs, "task-inputs", map[string]string{}, "Task Inputs")
 	flag.Parse()
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	if runTaskName == "" {
+	if taskName == "" {
 		crons()
 	} else {
-		runTask(runTaskName)
+		runTask(taskName, taskInputs)
 	}
-}
-
-func githubAuth(githubAccessToken string) (context.Context, *github.Client) {
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: githubAccessToken},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-
-	return ctx, github.NewClient(tc)
 }

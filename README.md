@@ -46,4 +46,4 @@ Notes:
  - Two different tasks
  - One is a Cron job running every minute
  - The second one must be manually invoked.
-
+ - Can use Golang text templates in the plain text to include variables
