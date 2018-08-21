@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/go-github/github"
+	"github.com/moby/moby/pkg/namesgenerator"
 	"golang.org/x/oauth2"
 )
 
@@ -68,8 +69,10 @@ func main() {
 	log.Println(config)
 
 	for k, v := range config {
-		timeNow := time.Now().UTC().Format(time.RFC3339)
-
+		var (
+			timeNow    = time.Now().UTC().Format(time.RFC3339)
+			branchName = namesgenerator.GetRandomName(5)
+		)
 		log.Println(k)
 
 		log.Println(repoInfo.GetMasterBranch())
@@ -81,7 +84,7 @@ func main() {
 		}
 
 		_, _, err = client.Git.CreateRef(ctx, githubOwner, githubRepo, &github.Reference{
-			Ref: github.String("refs/heads/foobar"),
+			Ref: github.String(fmt.Sprintf("refs/heads/%s", branchName)),
 			Object: &github.GitObject{
 				SHA: branch.Commit.SHA,
 			},
@@ -102,9 +105,9 @@ func main() {
 		log.Println(fileContent)
 
 		opts := &github.RepositoryContentFileOptions{
-			Message: github.String(fmt.Sprintf("%s %s", timeNow, v.PullRequestTitle)),
+			Message: github.String(fmt.Sprintf("%s: %s", timeNow, v.PullRequestTitle)),
 			Content: []byte(fileContent),
-			Branch:  github.String("foobar"),
+			Branch:  github.String(branchName),
 			Committer: &github.CommitAuthor{
 				Name:  github.String("FirstName LastName"),
 				Email: github.String("user@example.com"),
@@ -117,8 +120,8 @@ func main() {
 		}
 
 		newPR := &github.NewPullRequest{
-			Title:               github.String(fmt.Sprintf("%s %s", timeNow, v.PullRequestTitle)),
-			Head:                github.String("foobar"),
+			Title:               github.String(fmt.Sprintf("%s: %s", timeNow, v.PullRequestTitle)),
+			Head:                github.String(branchName),
 			Base:                github.String("master"),
 			Body:                github.String("This is the description of the PR created with the package `github.com/google/go-github/github`"),
 			MaintainerCanModify: github.Bool(true),
