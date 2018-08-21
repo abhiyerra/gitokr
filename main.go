@@ -41,30 +41,26 @@ type GitSOPConfig []struct {
 	Inputs map[string]Input `json:"inputs"`
 }
 
-func main() {
-	var (
-		githubOwner       string
-		githubRepo        string
-		githubAccessToken string
+var (
+	githubOwner       string
+	githubRepo        string
+	githubAccessToken string
+)
 
-		config GitSOPConfig
-	)
+func webhooks() {
+	for {
 
-	flag.StringVar(&githubRepo, "github-repo", "", "Github Repo. Ex. gitsop")
-	flag.StringVar(&githubOwner, "github-owner", "", "Github Owner. Ex. abhiyerra")
-	flag.StringVar(&githubAccessToken, "github-access-token", "", "Github Access Token")
-	flag.Parse()
+		time.Sleep(time.Minute)
+	}
+}
 
-	rand.Seed(time.Now().UTC().UnixNano())
-
-	ctx, client := githubAuth(githubAccessToken)
-
-	repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, "gitsop.json", nil)
+func repoConfig(ctx context.Context, client *github.Client) (config GitSOPConfig, repoInfo *github.Repository) {
+	repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, ".gitsop/config.json", nil)
 	if err != nil {
 		log.Fatal("Error", err)
 	}
 
-	repoInfo, _, err := client.Repositories.Get(ctx, githubOwner, githubRepo)
+	repoInfo, _, err = client.Repositories.Get(ctx, githubOwner, githubRepo)
 	if err != nil {
 		log.Fatal("Error", err)
 	}
@@ -81,95 +77,116 @@ func main() {
 	}
 	log.Println(config)
 
-	for _, task := range config {
-		var (
-			timeNow    = time.Now().UTC().Format(time.RFC3339)
-			branchName = namesgenerator.GetRandomName(1)
-		)
+	return config, repoInfo
+}
 
-		log.Println("Branch", branchName)
+func crons() {
+	for {
+		ctx, client := githubAuth(githubAccessToken)
+		config, repoInfo := repoConfig(ctx, client)
 
-		if task.Cron == "" {
-			continue
-		}
+		for _, task := range config {
+			var (
+				timeNow    = time.Now().UTC().Format(time.RFC3339)
+				branchName = namesgenerator.GetRandomName(1)
+			)
 
-		schedule, err := cron.Parse(task.Cron)
-		if err != nil {
-			log.Fatal("Error", err)
-		}
+			log.Println("Branch", branchName)
 
-		if schedule.Next(time.Now()).After(time.Now()) {
+			if task.Cron == "" {
+				continue
+			}
 
-			log.Println(task)
-
-			log.Println(repoInfo.GetMasterBranch())
-			// Create Branch
-
-			branch, _, err := client.Repositories.GetBranch(ctx, githubOwner, githubRepo, "master")
+			schedule, err := cron.Parse(task.Cron)
 			if err != nil {
 				log.Fatal("Error", err)
 			}
 
-			_, _, err = client.Git.CreateRef(ctx, githubOwner, githubRepo, &github.Reference{
-				Ref: github.String(fmt.Sprintf("refs/heads/%s", branchName)),
-				Object: &github.GitObject{
-					SHA: branch.Commit.SHA,
-				},
-			})
-			if err != nil {
-				log.Fatal("Error", err)
-			}
+			if schedule.Next(time.Now()).After(time.Now()) {
+				log.Println(task)
 
-			for _, fileName := range task.Files {
-				repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, fileName, nil)
+				log.Println(repoInfo.GetMasterBranch())
+				// Create Branch
+
+				branch, _, err := client.Repositories.GetBranch(ctx, githubOwner, githubRepo, "master")
 				if err != nil {
 					log.Fatal("Error", err)
 				}
 
-				fileContent, err := repoConfig.GetContent()
-				if err != nil {
-					log.Fatal("Error", err)
-				}
-				log.Println(fileContent)
-
-				var fileContentBytes bytes.Buffer
-
-				t := template.Must(template.New("t1").Parse(fileContent))
-				t.Execute(&fileContentBytes, task.Inputs)
-
-				opts := &github.RepositoryContentFileOptions{
-					Message: github.String(fmt.Sprintf("%s: %s", timeNow, task.Title)),
-					Content: fileContentBytes.Bytes(),
-					Branch:  github.String(branchName),
-					Committer: &github.CommitAuthor{
-						Name:  github.String("GitSOP"),
-						Email: github.String("bot@gitsop.com"),
+				_, _, err = client.Git.CreateRef(ctx, githubOwner, githubRepo, &github.Reference{
+					Ref: github.String(fmt.Sprintf("refs/heads/%s", branchName)),
+					Object: &github.GitObject{
+						SHA: branch.Commit.SHA,
 					},
-				}
-				_, _, err = client.Repositories.CreateFile(ctx, githubOwner, githubRepo, filepath.Join(task.OutputDir, timeNow, fileName), opts)
+				})
 				if err != nil {
-					fmt.Println(err)
-					return
+					log.Fatal("Error", err)
 				}
-			}
 
-			newPR := &github.NewPullRequest{
-				Title:               github.String(fmt.Sprintf("%s: %s", timeNow, task.Title)),
-				Head:                github.String(branchName),
-				Base:                github.String("master"),
-				Body:                github.String(task.Instructions),
-				MaintainerCanModify: github.Bool(true),
-			}
+				for _, fileName := range task.Files {
+					repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, fileName, nil)
+					if err != nil {
+						log.Fatal("Error", err)
+					}
 
-			pr, _, err := client.PullRequests.Create(ctx, githubOwner, githubRepo, newPR)
-			if err != nil {
-				log.Fatal("Error", err)
-			}
+					fileContent, err := repoConfig.GetContent()
+					if err != nil {
+						log.Fatal("Error", err)
+					}
+					log.Println(fileContent)
 
-			log.Printf("PR created: %s\n", pr.GetHTMLURL())
+					var fileContentBytes bytes.Buffer
+
+					t := template.Must(template.New("t1").Parse(fileContent))
+					t.Execute(&fileContentBytes, task.Inputs)
+
+					opts := &github.RepositoryContentFileOptions{
+						Message: github.String(fmt.Sprintf("%s: %s", timeNow, task.Title)),
+						Content: fileContentBytes.Bytes(),
+						Branch:  github.String(branchName),
+						Committer: &github.CommitAuthor{
+							Name:  github.String("GitSOP"),
+							Email: github.String("bot@gitsop.com"),
+						},
+					}
+					_, _, err = client.Repositories.CreateFile(ctx, githubOwner, githubRepo, filepath.Join(task.OutputDir, timeNow, fileName), opts)
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
+				}
+
+				newPR := &github.NewPullRequest{
+					Title:               github.String(fmt.Sprintf("%s: %s", timeNow, task.Title)),
+					Head:                github.String(branchName),
+					Base:                github.String("master"),
+					Body:                github.String(task.Instructions),
+					MaintainerCanModify: github.Bool(true),
+				}
+
+				pr, _, err := client.PullRequests.Create(ctx, githubOwner, githubRepo, newPR)
+				if err != nil {
+					log.Fatal("Error", err)
+				}
+
+				log.Printf("PR created: %s\n", pr.GetHTMLURL())
+			}
 		}
-	}
 
+		time.Sleep(time.Minute)
+	}
+}
+
+func main() {
+
+	flag.StringVar(&githubRepo, "github-repo", "", "Github Repo. Ex. gitsop")
+	flag.StringVar(&githubOwner, "github-owner", "", "Github Owner. Ex. abhiyerra")
+	flag.StringVar(&githubAccessToken, "github-access-token", "", "Github Access Token")
+	flag.Parse()
+
+	rand.Seed(time.Now().UTC().UnixNano())
+
+	crons()
 }
 
 func githubAuth(githubAccessToken string) (context.Context, *github.Client) {
