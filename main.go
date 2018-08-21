@@ -6,12 +6,14 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"path/filepath"
+	"time"
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
 
-type GitsopConfig map[string]struct {
+type GitSOPConfig map[string]struct {
 	Assignee  string `json:"assignee"`
 	FileName  string `json:"fileName"`
 	OutputDir string `json:"outputDir"`
@@ -31,7 +33,7 @@ func main() {
 		githubRepo        string
 		githubAccessToken string
 
-		config GitsopConfig
+		config GitSOPConfig
 	)
 
 	flag.StringVar(&githubRepo, "github-repo", "", "Github Repo. Ex. gitsop")
@@ -101,9 +103,10 @@ func main() {
 			Branch:  github.String("foobar"),
 			Committer: &github.CommitAuthor{
 				Name:  github.String("FirstName LastName"),
-				Email: github.String("user@example.com")},
+				Email: github.String("user@example.com"),
+			},
 		}
-		_, _, err = client.Repositories.CreateFile(ctx, githubOwner, githubRepo, "foobar.md", opts)
+		_, _, err = client.Repositories.CreateFile(ctx, githubOwner, githubRepo, filepath.Join(v.OutputDir, time.Now().UTC().Format(time.RFC3339), v.FileName), opts)
 		if err != nil {
 			fmt.Println(err)
 			return
