@@ -2,6 +2,7 @@
     "* * * * *": {
         "assignee": "abhiyerra",
         "fileName": "docs/DAILY_TODO.md",
-        "outputDir": "tasks/"
+        "outputDir": "tasks/",
+        "pullRequestTitle": "Daily Todo"
     }
 }

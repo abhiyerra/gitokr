@@ -17,6 +17,8 @@ type GitSOPConfig map[string]struct {
 	Assignee  string `json:"assignee"`
 	FileName  string `json:"fileName"`
 	OutputDir string `json:"outputDir"`
+
+	PullRequestTitle string `json:"pullRequestTitle"`
 }
 
 // gitsop
@@ -66,6 +68,8 @@ func main() {
 	log.Println(config)
 
 	for k, v := range config {
+		timeNow := time.Now().UTC().Format(time.RFC3339)
+
 		log.Println(k)
 
 		log.Println(repoInfo.GetMasterBranch())
@@ -98,7 +102,7 @@ func main() {
 		log.Println(fileContent)
 
 		opts := &github.RepositoryContentFileOptions{
-			Message: github.String("This is my commit message"),
+			Message: github.String(fmt.Sprintf("%s %s", timeNow, v.PullRequestTitle)),
 			Content: []byte(fileContent),
 			Branch:  github.String("foobar"),
 			Committer: &github.CommitAuthor{
@@ -106,14 +110,14 @@ func main() {
 				Email: github.String("user@example.com"),
 			},
 		}
-		_, _, err = client.Repositories.CreateFile(ctx, githubOwner, githubRepo, filepath.Join(v.OutputDir, time.Now().UTC().Format(time.RFC3339), v.FileName), opts)
+		_, _, err = client.Repositories.CreateFile(ctx, githubOwner, githubRepo, filepath.Join(v.OutputDir, timeNow, v.FileName), opts)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
 		newPR := &github.NewPullRequest{
-			Title:               github.String("My awesome pull request"),
+			Title:               github.String(fmt.Sprintf("%s %s", timeNow, v.PullRequestTitle)),
 			Head:                github.String("foobar"),
 			Base:                github.String("master"),
 			Body:                github.String("This is the description of the PR created with the package `github.com/google/go-github/github`"),
