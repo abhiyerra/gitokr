@@ -29,12 +29,11 @@ type Input struct {
 }
 
 type Task struct {
-	Cron      string   `json:"cron"`
-	Assignee  string   `json:"assignee"`
-	Files     []string `json:"files"`
-	OutputDir string   `json:"outputDir"`
-
-	Instructions string `json:"instructions"`
+	Cron      string    `json:"cron"`
+	Assignee  string    `json:"assignee"`
+	Assignees *[]string `json:"assignees"`
+	Files     []string  `json:"files"`
+	OutputDir string    `json:"outputDir"`
 
 	Inputs map[string]Input `json:"inputs"`
 }
@@ -118,8 +117,9 @@ func createTask(ctx context.Context, config GitSOPConfig, client *github.Client,
 	}
 
 	newIssue := &github.IssueRequest{
-		Title: github.String(fmt.Sprintf("%s: %s", timeNow, title)),
-		Body:  github.String(strings.Join(issueText, "\n")),
+		Title:     github.String(fmt.Sprintf("%s: %s", timeNow, title)),
+		Body:      github.String(strings.Join(issueText, "\n")),
+		Assignees: task.Assignees,
 	}
 
 	pr, _, err := client.Issues.Create(ctx, githubOwner, githubRepo, newIssue)

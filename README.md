@@ -20,20 +20,16 @@ Config:
 {
     "Daily Todo": {
         "cron": "* * * * *",
-        "assignee": "abhiyerra",
+        "assignees": ["abhiyerra"],
         "files": [
             "sops/DAILY_TODO.md"
         ],
-        "outputDir": "sops/output",
-        "instructions": "Do this entire checklist everyday and merge it into the master branch."
     },
     "New Employee": {
-        "assignee": "abhiyerra",
+        "assignees": ["abhiyerra"],
         "files": [
             "sops/NEW_EMPLOYEE.md"
         ],
-        "outputDir": "sops/output",
-        "instructions": "Do this checklist to onboard a new employee"
         "inputs": {
             "employeeName": {}
         }
