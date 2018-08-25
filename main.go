@@ -7,11 +7,10 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"path/filepath"
+	"strings"
 	"text/template"
 	"time"
 
-	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/google/go-github/github"
 	"github.com/robfig/cron"
 	flag "github.com/spf13/pflag"
@@ -85,30 +84,10 @@ func repoConfig(ctx context.Context, client *github.Client) (config GitSOPConfig
 }
 
 func createTask(ctx context.Context, config GitSOPConfig, client *github.Client, repoInfo *github.Repository, title string, task Task, taskInputs map[string]string) {
-	branchName := namesgenerator.GetRandomName(1)
 	timeNow := time.Now().UTC().Format(time.RFC3339)
-
-	log.Println("Branch", branchName)
+	var issueText []string
 
 	log.Println(task)
-
-	log.Println(repoInfo.GetMasterBranch())
-	// Create Branch
-
-	branch, _, err := client.Repositories.GetBranch(ctx, githubOwner, githubRepo, "master")
-	if err != nil {
-		log.Fatal("Error", err)
-	}
-
-	_, _, err = client.Git.CreateRef(ctx, githubOwner, githubRepo, &github.Reference{
-		Ref: github.String(fmt.Sprintf("refs/heads/%s", branchName)),
-		Object: &github.GitObject{
-			SHA: branch.Commit.SHA,
-		},
-	})
-	if err != nil {
-		log.Fatal("Error", err)
-	}
 
 	for _, fileName := range task.Files {
 		repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, fileName, nil)
@@ -135,31 +114,15 @@ func createTask(ctx context.Context, config GitSOPConfig, client *github.Client,
 		t := template.Must(template.New("t1").Parse(fileContent))
 		t.Execute(&fileContentBytes, task.Inputs)
 
-		opts := &github.RepositoryContentFileOptions{
-			Message: github.String(fmt.Sprintf("%s: %s", timeNow, title)),
-			Content: fileContentBytes.Bytes(),
-			Branch:  github.String(branchName),
-			Committer: &github.CommitAuthor{
-				Name:  github.String("GitSOP"),
-				Email: github.String("bot@gitsop.com"),
-			},
-		}
-		_, _, err = client.Repositories.CreateFile(ctx, githubOwner, githubRepo, filepath.Join(task.OutputDir, timeNow, fileName), opts)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+		issueText = append(issueText, string(fileContentBytes.String()))
 	}
 
-	newPR := &github.NewPullRequest{
-		Title:               github.String(fmt.Sprintf("%s: %s", timeNow, title)),
-		Head:                github.String(branchName),
-		Base:                github.String("master"),
-		Body:                github.String(task.Instructions),
-		MaintainerCanModify: github.Bool(true),
+	newIssue := &github.IssueRequest{
+		Title: github.String(fmt.Sprintf("%s: %s", timeNow, title)),
+		Body:  github.String(strings.Join(issueText, "\n")),
 	}
 
-	pr, _, err := client.PullRequests.Create(ctx, githubOwner, githubRepo, newPR)
+	pr, _, err := client.Issues.Create(ctx, githubOwner, githubRepo, newIssue)
 	if err != nil {
 		log.Fatal("Error", err)
 	}

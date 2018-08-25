@@ -4,8 +4,6 @@
         "assignee": "abhiyerra",
         "files": [
             "sops/DAILY_TODO.md"
-        ],
-        "outputDir": "sops/output",
-        "instructions": "Do this entire checklist everyday and merge it into the master branch."
+        ]
     }
 }
