@@ -47,8 +47,6 @@ type Task struct {
 type GitSOPConfig map[string]Task
 
 var (
-	githubOwner       string
-	githubRepo        string
 	githubAccessToken string
 
 	awsAccessKey       string
@@ -70,13 +68,13 @@ func githubAuth(githubAccessToken string) (context.Context, *github.Client) {
 	return ctx, github.NewClient(tc)
 }
 
-func repoConfig(ctx context.Context, client *github.Client) (config GitSOPConfig, repoInfo *github.Repository) {
-	repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, configFile, nil)
+func repoConfig(ctx context.Context, client *github.Client, owner string, repo string) (config GitSOPConfig, repoInfo *github.Repository) {
+	repoConfig, _, _, err := client.Repositories.GetContents(ctx, owner, repo, configFile, nil)
 	if err != nil {
 		log.Fatal("Error", err)
 	}
 
-	repoInfo, _, err = client.Repositories.Get(ctx, githubOwner, githubRepo)
+	repoInfo, _, err = client.Repositories.Get(ctx, owner, repo)
 	if err != nil {
 		log.Fatal("Error", err)
 	}
@@ -103,9 +101,10 @@ func createTask(ctx context.Context, config GitSOPConfig, client *github.Client,
 	log.Println(task)
 
 	for _, fileName := range task.Files {
-		repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, fileName, nil)
+		repoConfig, _, _, err := client.Repositories.GetContents(ctx, repoInfo.GetOwner().GetLogin(), repoInfo.GetName(), fileName, nil)
 		if err != nil {
-			log.Fatal("Error", err)
+			log.Println("Error", err)
+			continue
 		}
 
 		fileContent, err := repoConfig.GetContent()
@@ -124,6 +123,9 @@ func createTask(ctx context.Context, config GitSOPConfig, client *github.Client,
 		}
 
 		t := template.Must(template.New("t1").Parse(fileContent))
+		if err != nil {
+			log.Println(err)
+		}
 		t.Execute(&fileContentBytes, task.Inputs)
 
 		issueText = append(issueText, string(fileContentBytes.String()))
@@ -135,9 +137,9 @@ func createTask(ctx context.Context, config GitSOPConfig, client *github.Client,
 		Assignees: task.Assignees,
 	}
 
-	pr, _, err := client.Issues.Create(ctx, githubOwner, githubRepo, newIssue)
+	pr, _, err := client.Issues.Create(ctx, repoInfo.GetOwner().GetLogin(), repoInfo.GetName(), newIssue)
 	if err != nil {
-		log.Fatal("Error", err)
+		log.Println("Error", err)
 	}
 
 	log.Printf("PR created: %s\n", pr.GetHTMLURL())
@@ -148,7 +150,7 @@ type CronRun struct {
 	NextRun time.Time
 }
 
-func crons() {
+func crons(repos []string) {
 	sess, err := session.NewSession(&aws.Config{
 		Region:      aws.String("us-west-2"),
 		Credentials: credentials.NewSharedCredentials("", "opszero"),
@@ -161,68 +163,76 @@ func crons() {
 	svc := dynamodb.New(sess)
 
 	for {
-		ctx, client := githubAuth(githubAccessToken)
-		config, repoInfo := repoConfig(ctx, client)
 
-		for title, task := range config {
-			if task.Cron == "" {
-				continue
-			}
+		for _, repo := range repos {
 
-			tableKey := fmt.Sprintf("%s-%s", repoInfo.GetGitURL(), title)
+			spl := strings.Split(repo, "/")
 
-			schedule, err := cron.Parse(task.Cron)
-			if err != nil {
-				log.Fatal("Error", err)
-			}
+			go func(owner, repo string) {
+				ctx, client := githubAuth(githubAccessToken)
+				config, repoInfo := repoConfig(ctx, client, owner, repo)
 
-			result, err := svc.GetItem(&dynamodb.GetItemInput{
-				TableName: aws.String(dynamoTable),
-				Key: map[string]*dynamodb.AttributeValue{
-					"Task": {
-						S: aws.String(tableKey),
-					},
-				},
-			})
+				for title, task := range config {
+					if task.Cron == "" {
+						continue
+					}
 
-			log.Println(err)
+					tableKey := fmt.Sprintf("%s-%s", repoInfo.GetGitURL(), title)
 
-			nextRun := CronRun{}
-			err = dynamodbattribute.UnmarshalMap(result.Item, &nextRun)
+					schedule, err := cron.Parse(task.Cron)
+					if err != nil {
+						log.Fatal("Error", err)
+					}
 
-			log.Println(err)
+					result, err := svc.GetItem(&dynamodb.GetItemInput{
+						TableName: aws.String(dynamoTable),
+						Key: map[string]*dynamodb.AttributeValue{
+							"Task": {
+								S: aws.String(tableKey),
+							},
+						},
+					})
 
-			log.Println("Foobar", nextRun, result.Item)
+					log.Println(err)
 
-			if time.Now().After(nextRun.NextRun) {
-				createTask(ctx, config, client, repoInfo, title, task, nil)
+					nextRun := CronRun{}
+					err = dynamodbattribute.UnmarshalMap(result.Item, &nextRun)
 
-				nextRun.Task = tableKey
-				nextRun.NextRun = schedule.Next(time.Now())
+					log.Println(err)
 
-				av, err := dynamodbattribute.MarshalMap(nextRun)
-				if err != nil {
-					log.Printf("failed to DynamoDB marshal Record, %v", err)
+					log.Println("Foobar", nextRun, result.Item)
+
+					if time.Now().After(nextRun.NextRun) {
+						createTask(ctx, config, client, repoInfo, title, task, nil)
+
+						nextRun.Task = tableKey
+						nextRun.NextRun = schedule.Next(time.Now())
+
+						av, err := dynamodbattribute.MarshalMap(nextRun)
+						if err != nil {
+							log.Printf("failed to DynamoDB marshal Record, %v", err)
+						}
+
+						_, err = svc.PutItem(&dynamodb.PutItemInput{
+							TableName: aws.String(dynamoTable),
+							Item:      av,
+						})
+						if err != nil {
+							log.Printf("failed to put Record to DynamoDB, %v", err)
+						}
+					}
 				}
+			}(spl[0], spl[1])
 
-				_, err = svc.PutItem(&dynamodb.PutItemInput{
-					TableName: aws.String(dynamoTable),
-					Item:      av,
-				})
-				if err != nil {
-					log.Printf("failed to put Record to DynamoDB, %v", err)
-				}
-			}
 		}
-
 		time.Sleep(time.Minute)
 	}
 }
 
-func runTask(taskName string, taskInputs map[string]string) {
+func runTask(taskName string, taskInputs map[string]string, owner string, repo string) {
 	log.Println(taskInputs)
 	ctx, client := githubAuth(githubAccessToken)
-	config, repoInfo := repoConfig(ctx, client)
+	config, repoInfo := repoConfig(ctx, client, owner, repo)
 
 	task, ok := config[taskName]
 	if !ok {
@@ -236,6 +246,9 @@ func main() {
 	var (
 		taskName   string
 		taskInputs map[string]string
+
+		githubRepo  string
+		githubOwner string
 	)
 
 	flag.StringVar(&githubRepo, "github-repo", "", "Github Repo. Ex. gitsop")
@@ -248,8 +261,15 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	if taskName == "" {
-		crons()
+
+		var repos = []string{
+			"acksin/consulting",
+			"acksin/gitlead",
+			"acksin/SaleIron",
+			"abhiyerra/dotfiles",
+		}
+		crons(repos)
 	} else {
-		runTask(taskName, taskInputs)
+		runTask(taskName, taskInputs, githubOwner, githubRepo)
 	}
 }
