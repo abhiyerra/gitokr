@@ -46,6 +46,10 @@ var (
 	githubAccessToken string
 )
 
+const (
+	configFile = ".gitsop/config.json"
+)
+
 func githubAuth(githubAccessToken string) (context.Context, *github.Client) {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
@@ -57,7 +61,7 @@ func githubAuth(githubAccessToken string) (context.Context, *github.Client) {
 }
 
 func repoConfig(ctx context.Context, client *github.Client) (config GitSOPConfig, repoInfo *github.Repository) {
-	repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, ".gitsop/config.json", nil)
+	repoConfig, _, _, err := client.Repositories.GetContents(ctx, githubOwner, githubRepo, configFile, nil)
 	if err != nil {
 		log.Fatal("Error", err)
 	}
