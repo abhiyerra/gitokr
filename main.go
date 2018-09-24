@@ -15,6 +15,12 @@ import (
 	"github.com/robfig/cron"
 	flag "github.com/spf13/pflag"
 	"golang.org/x/oauth2"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
 const (
@@ -44,10 +50,14 @@ var (
 	githubOwner       string
 	githubRepo        string
 	githubAccessToken string
+
+	awsAccessKey       string
+	awsSecretAccessKey string
 )
 
 const (
-	configFile = ".gitsop/config.json"
+	configFile  = ".gitsop/config.json"
+	dynamoTable = "GitSOP"
 )
 
 func githubAuth(githubAccessToken string) (context.Context, *github.Client) {
@@ -102,7 +112,6 @@ func createTask(ctx context.Context, config GitSOPConfig, client *github.Client,
 		if err != nil {
 			log.Fatal("Error", err)
 		}
-		log.Println(fileContent)
 
 		var fileContentBytes bytes.Buffer
 
@@ -134,10 +143,22 @@ func createTask(ctx context.Context, config GitSOPConfig, client *github.Client,
 	log.Printf("PR created: %s\n", pr.GetHTMLURL())
 }
 
+type CronRun struct {
+	Task    string
+	NextRun time.Time
+}
+
 func crons() {
-	var (
-		nextRuns = make(map[string]time.Time)
-	)
+	sess, err := session.NewSession(&aws.Config{
+		Region:      aws.String("us-west-2"),
+		Credentials: credentials.NewSharedCredentials("", "opszero"),
+	})
+	if err != nil {
+		log.Fatal("Error", err)
+	}
+
+	// Create DynamoDB client
+	svc := dynamodb.New(sess)
 
 	for {
 		ctx, client := githubAuth(githubAccessToken)
@@ -148,15 +169,49 @@ func crons() {
 				continue
 			}
 
+			tableKey := fmt.Sprintf("%s-%s", repoInfo.GetGitURL(), title)
+
 			schedule, err := cron.Parse(task.Cron)
 			if err != nil {
 				log.Fatal("Error", err)
 			}
 
-			nextRun, ok := nextRuns[title]
-			if !ok || schedule.Next(time.Now()).After(nextRun) {
+			result, err := svc.GetItem(&dynamodb.GetItemInput{
+				TableName: aws.String(dynamoTable),
+				Key: map[string]*dynamodb.AttributeValue{
+					"Task": {
+						S: aws.String(tableKey),
+					},
+				},
+			})
+
+			log.Println(err)
+
+			nextRun := CronRun{}
+			err = dynamodbattribute.UnmarshalMap(result.Item, &nextRun)
+
+			log.Println(err)
+
+			log.Println("Foobar", nextRun, result.Item)
+
+			if time.Now().After(nextRun.NextRun) {
 				createTask(ctx, config, client, repoInfo, title, task, nil)
-				nextRuns[title] = schedule.Next(time.Now())
+
+				nextRun.Task = tableKey
+				nextRun.NextRun = schedule.Next(time.Now())
+
+				av, err := dynamodbattribute.MarshalMap(nextRun)
+				if err != nil {
+					log.Printf("failed to DynamoDB marshal Record, %v", err)
+				}
+
+				_, err = svc.PutItem(&dynamodb.PutItemInput{
+					TableName: aws.String(dynamoTable),
+					Item:      av,
+				})
+				if err != nil {
+					log.Printf("failed to put Record to DynamoDB, %v", err)
+				}
 			}
 		}
 
