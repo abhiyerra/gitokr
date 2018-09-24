@@ -122,7 +122,9 @@ func createTask(ctx context.Context, config GitSOPConfig, client *github.Client,
 			}
 		}
 
-		t := template.Must(template.New("t1").Parse(fileContent))
+		t := template.Must(template.New("t1").Funcs(template.FuncMap{
+			"weekday": time.Now().Weekday().String,
+		}).Parse(fileContent))
 		if err != nil {
 			log.Println(err)
 		}
@@ -262,6 +264,7 @@ func main() {
 
 	if taskName == "" {
 
+		// TODO
 		var repos = []string{
 			"acksin/consulting",
 			"acksin/gitlead",
