@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net/http"
+	"net/url"
 	"strings"
 	"text/template"
 	"time"
@@ -23,11 +25,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
-const (
-	HumanInputType   = "human"
-	CommandInputType = "command"
-)
-
 type Input struct {
 	Type    string `json:"type"`
 	Value   string `json:"value"`
@@ -35,13 +32,12 @@ type Input struct {
 }
 
 type Task struct {
-	Cron      string    `json:"cron"`
-	Assignee  string    `json:"assignee"`
-	Assignees *[]string `json:"assignees"`
-	Files     []string  `json:"files"`
-	OutputDir string    `json:"outputDir"`
-
-	Inputs map[string]Input `json:"inputs"`
+	Cron      string           `json:"cron"`
+	Assignee  string           `json:"assignee"`
+	Assignees *[]string        `json:"assignees"`
+	Files     []string         `json:"files"`
+	Webhook   string           `json:"webhook"`
+	Inputs    map[string]Input `json:"inputs"`
 }
 
 type GitSOPConfig map[string]Task
@@ -133,18 +129,30 @@ func createTask(ctx context.Context, config GitSOPConfig, client *github.Client,
 		issueText = append(issueText, string(fileContentBytes.String()))
 	}
 
-	newIssue := &github.IssueRequest{
-		Title:     github.String(fmt.Sprintf("%s: %s", timeNow, title)),
-		Body:      github.String(strings.Join(issueText, "\n")),
-		Assignees: task.Assignees,
-	}
+	if task.Webhook == "" {
+		newIssue := &github.IssueRequest{
+			Title:     github.String(fmt.Sprintf("%s: %s", timeNow, title)),
+			Body:      github.String(strings.Join(issueText, "\n")),
+			Assignees: task.Assignees,
+		}
 
-	pr, _, err := client.Issues.Create(ctx, repoInfo.GetOwner().GetLogin(), repoInfo.GetName(), newIssue)
-	if err != nil {
-		log.Println("Error", err)
-	}
+		pr, _, err := client.Issues.Create(ctx, repoInfo.GetOwner().GetLogin(), repoInfo.GetName(), newIssue)
+		if err != nil {
+			log.Println("Error", err)
+		}
 
-	log.Printf("PR created: %s\n", pr.GetHTMLURL())
+		log.Printf("PR created: %s\n", pr.GetHTMLURL())
+	} else {
+		resp, err := http.PostForm(task.Webhook, url.Values{
+			"title":   {title},
+			"body":    {strings.Join(issueText, "\n")},
+			"timeNow": {timeNow},
+		})
+		if err != nil {
+			log.Println(err)
+		}
+		defer resp.Body.Close()
+	}
 }
 
 type CronRun struct {
@@ -270,6 +278,7 @@ func main() {
 			"acksin/gitlead",
 			"acksin/SaleIron",
 			"abhiyerra/dotfiles",
+			"startupsonoma/community",
 		}
 		crons(repos)
 	} else {
