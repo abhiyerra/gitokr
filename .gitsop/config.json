@@ -1,6 +1,6 @@
 {
     "Daily Todo": {
-        "cron": "* * * * *",
+        "cron": "* * * * * *",
         "assignees": ["abhiyerra"],
         "files": [
             "sops/DAILY_TODO.md"
