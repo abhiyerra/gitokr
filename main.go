@@ -26,9 +26,8 @@ import (
 )
 
 type Input struct {
-	Type    string `json:"type"`
-	Value   string `json:"value"`
-	Command string `json:"command"`
+	Type  string `json:"type"`
+	Value string `json:"value"`
 }
 
 type Task struct {
@@ -91,7 +90,7 @@ func repoConfig(ctx context.Context, client *github.Client, owner string, repo s
 }
 
 func createTask(ctx context.Context, config GitSOPConfig, client *github.Client, repoInfo *github.Repository, title string, task Task, taskInputs map[string]string) {
-	timeNow := time.Now().UTC().Format(time.RFC3339)
+	timeNow := time.Now().UTC().Format("Mon Jan _2")
 	var issueText []string
 
 	log.Println(task)
