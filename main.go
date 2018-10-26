@@ -1,9 +1,14 @@
 package main
 
 import (
+	"log"
 	"math/rand"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 	flag "github.com/spf13/pflag"
 )
 
@@ -25,6 +30,17 @@ func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
+	sess, err := session.NewSession(&aws.Config{
+		Region:      aws.String("us-west-2"),
+		Credentials: credentials.NewSharedCredentials("", "opszero"),
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Create DynamoDB githubClient
+	svc := dynamodb.New(sess)
+
 	// TODO
 	var repos = []string{
 		"acksin/consulting",
@@ -33,5 +49,11 @@ func main() {
 		"abhiyerra/dotfiles",
 		"startupsonoma/community",
 	}
-	crons(repos)
+
+	waiter := make(chan struct{}, 1)
+	for _, i := range repos {
+		go NewRepoConfig(i, svc).RunCrons()
+	}
+
+	<-waiter
 }
