@@ -31,7 +31,7 @@ type Task struct {
 	Inputs    map[string]Input `json:"inputs"`
 
 	cronRun struct {
-		Title   string
+		Task    string
 		NextRun time.Time
 	}
 }
@@ -68,7 +68,7 @@ func (t *Task) RunCron(rc *RepoConfig, title string) {
 	if time.Now().After(t.cronRun.NextRun) {
 		t.createSOP(rc, title)
 
-		t.cronRun.Title = tableKey
+		t.cronRun.Task = tableKey
 		t.cronRun.NextRun = schedule.Next(time.Now())
 
 		av, err := dynamodbattribute.MarshalMap(t.cronRun)

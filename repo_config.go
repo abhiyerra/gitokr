@@ -24,7 +24,7 @@ type RepoConfig struct {
 }
 
 func NewRepoConfig(repo string, svc *dynamodb.DynamoDB) (r *RepoConfig) {
-	r = &RepoConfig{}
+	r = &RepoConfig{repo: repo}
 
 	r.ctx = context.Background()
 	ts := oauth2.StaticTokenSource(

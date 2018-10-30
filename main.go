@@ -50,9 +50,17 @@ func main() {
 		"startupsonoma/community",
 	}
 
+	var rcs []*RepoConfig
 	waiter := make(chan struct{}, 1)
+
 	for _, i := range repos {
-		go NewRepoConfig(i, svc).RunCrons()
+		rcs = append(rcs, NewRepoConfig(i, svc))
+	}
+
+	//RunHTTP()
+
+	for _, i := range rcs {
+		go i.RunCrons()
 	}
 
 	<-waiter
