@@ -57,7 +57,7 @@ func main() {
 		rcs = append(rcs, NewRepoConfig(i, svc))
 	}
 
-	//RunHTTP()
+	go RunHTTP()
 
 	for _, i := range rcs {
 		go i.RunCrons()

@@ -109,10 +109,12 @@ func (task *Task) createSOP(rc *RepoConfig, title string) {
 
 		log.Println(fileContent)
 
+		fmt.Println("Template:", title)
 		t := template.Must(template.New("t1").Funcs(template.FuncMap{
 			"weekday": time.Now().Weekday().String,
 		}).Parse(fileContent))
 		if err != nil {
+
 			log.Println(err)
 		}
 		t.Execute(&fileContentBytes, task.Inputs)
@@ -145,16 +147,3 @@ func (task *Task) createSOP(rc *RepoConfig, title string) {
 		defer resp.Body.Close()
 	}
 }
-
-// func runTask(taskName string, taskInputs map[string]string, owner string, repo string) {
-// 	log.Println(taskInputs)
-// 	ctx, client := githubAuth(githubAccessToken)
-// 	config, repoInfo := repoConfig(ctx, client, owner, repo)
-
-// 	task, ok := config[taskName]
-// 	if !ok {
-// 		log.Fatal(taskName, "doesn't exist.")
-// 	}
-
-// 	createTask(ctx, config, client, repoInfo, taskName, task, taskInputs)
-// }

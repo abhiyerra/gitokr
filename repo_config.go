@@ -63,6 +63,28 @@ func NewRepoConfig(repo string, svc *dynamodb.DynamoDB) (r *RepoConfig) {
 	return r
 }
 
+func (c *RepoConfig) GetSOPs() map[string]*Task {
+	r := make(map[string]*Task)
+
+	for k, v := range c.config {
+		if v.Cron == "" {
+			r[k] = v
+		}
+	}
+
+	return r
+}
+
+func (c *RepoConfig) GetSOP(title string) *Task {
+	for k, v := range c.config {
+		if k == title {
+			return v
+		}
+	}
+
+	return nil
+}
+
 func (c *RepoConfig) RunCrons() {
 	for {
 		for title, task := range c.config {

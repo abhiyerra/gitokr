@@ -10,10 +10,47 @@ import (
 )
 
 func getRepoTemplates(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+
+	c := NewRepoConfig(r.URL.Path[1:], nil)
+
+	var s string
+	s += "<html><head></head><body>"
+	for title, task := range c.GetSOPs() {
+		log.Println(title)
+
+		_ = task
+		s += "<form method='post'>"
+		s += "<h1>" + title + "</h1>"
+		s += "<input type='hidden' name='title' value='" + title + "'/>"
+		s += "Name: <input type='text' name='name' /><br/>"
+		if task.Inputs != nil {
+			for name, input := range task.Inputs {
+				s += name + ": <input name='" + name + "' type='text' value='" + input.Value + "'/><br/>"
+			}
+		}
+		s += "<input type='submit' />"
+		s += "</form>"
+	}
+
+	s += "</body>"
+
+	fmt.Fprintf(w, s)
 }
 
 func postRepoTemplate(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	log.Println(r.Form)
+
+	c := NewRepoConfig(r.URL.Path[1:], nil)
+
+	task := c.GetSOP(r.Form.Get("title"))
+
+	for k := range task.Inputs {
+		task.Inputs[k] = Input{Value: r.Form.Get(k)}
+	}
+
+	task.createSOP(c, r.Form.Get("name"))
+
 	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 }
 
