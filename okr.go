@@ -11,7 +11,7 @@ type OKRs map[string]*OKR
 func (o OKRs) Trs() (trs []string) {
 
 	for period, okr := range o {
-		f := fmt.Sprintf(`<tr><td>%s</td></tr>`, period)
+		f := fmt.Sprintf(`<tr><td colspan="2"><font>%s</font></td></tr>`, period)
 		f += fmt.Sprintf(`%s`, okr.Table())
 
 		trs = append(trs, f)
@@ -23,7 +23,6 @@ func (o OKRs) Trs() (trs []string) {
 type OKR struct {
 	Objective  string
 	KeyResults []KeyResult
-	Status     string
 }
 
 func (o OKR) NodeName() string {
@@ -37,11 +36,24 @@ func (o OKR) NodeName() string {
 func (o OKR) Table() string {
 	var text string
 
-	text += fmt.Sprintf(`<tr><td><b>Objective:</b> %s</td></tr>`, o.Objective)
-	text += fmt.Sprintf(`<tr><td><b>Key Results:</b></td></tr>`)
-	for t := range o.KeyResults {
-		text += fmt.Sprintf("<tr><td>%s</td><td>%s</td></tr>", o.KeyResults[t].Metric, o.KeyResults[t].Status)
+	if o.KeyResults == nil {
+		return ""
 	}
+
+	text += fmt.Sprintf(`<tr><td>Objective:</td><td align="left">%s</td></tr>`, o.Objective)
+
+	var text2 string = `<table border="0" cellspacing="0" cellborder="1">`
+	for t := range o.KeyResults {
+		status := ""
+		if o.KeyResults[t].Done {
+			status = "green"
+		} else {
+			status = "red"
+		}
+		text2 += fmt.Sprintf(`<tr><td align="left" color="%s">%s</td></tr>`, status, o.KeyResults[t].Metric)
+	}
+	text2 += "</table>"
+	text += fmt.Sprintf(`<tr><td>Key Results:</td><td>%s</td></tr>`, text2)
 
 	return text
 }

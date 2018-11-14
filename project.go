@@ -6,7 +6,7 @@ import (
 	"github.com/awalterschulze/gographviz"
 )
 
-type Company struct {
+type Project struct {
 	Vision string
 	OKR    OKRs
 	Groups []*Group
@@ -14,7 +14,7 @@ type Company struct {
 	graph *gographviz.Graph
 }
 
-func (c *Company) WriteGraph() {
+func (c *Project) WriteGraph() {
 	c.graph, _ = gographviz.Read([]byte(`digraph G {}`))
 	if err := c.graph.SetName("G"); err != nil {
 		panic(err)
