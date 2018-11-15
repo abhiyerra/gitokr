@@ -1,6 +1,7 @@
 ---
   Name: "GitOKR"
   Vision: "Simple tool to manage OKRs using Github."
+
   Projects:
     - Name: "Product"
       OKR:
@@ -12,6 +13,16 @@
               Done: true
             - Metric: "Create Standard Operating Procedure Tasks. Merge GitSOP."
     - Name: "Marketing"
+      Cron:
+        - Name: "Marketing"
+          Schedule: "0 0 9 * * *"
+          Github:
+            Owner: abhiyerra
+            Repo: gitokr
+            Assignees:
+              - "abhiyerra"
+          Files:
+            - "Docs/MARKETING.md"
       OKR:
         Q4:
           Objective: "Get people to use it and expand on the use cases of the tool."
