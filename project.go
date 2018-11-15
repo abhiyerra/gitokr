@@ -1,29 +1,67 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/awalterschulze/gographviz"
 )
 
-type Project struct {
-	Vision string
-	OKR    OKRs
-	Groups []*Group
+const (
+	DefaultProjectType = "Project"
+	SystemProjectType  = "System"
+	APIProjectType     = "API"
+)
 
-	graph *gographviz.Graph
+type Project struct {
+	Name   string
+	Vision string
+
+	Type string
+
+	OKR OKRs
+
+	ExternalProjects []ExternalProject
+	Projects         []*Project
+	Members          []*Member
 }
 
-func (c *Project) WriteGraph() {
-	c.graph, _ = gographviz.Read([]byte(`digraph G {}`))
-	if err := c.graph.SetName("G"); err != nil {
-		panic(err)
+func (c *Project) NodeName() string {
+	return fmt.Sprintf("%s: %s", c.Type, c.Name)
+}
+
+func (c *Project) WriteGraph(g *gographviz.Graph, srcNode string) {
+	if c.Type == "" {
+		c.Type = DefaultProjectType
+	}
+	g.AddNode("G", nodeName(srcNode, c.Name), tableNode(c.NodeName(), c.Vision, c.OKR.Trs()))
+	if srcNode != "" {
+		g.AddEdge(srcNode, nodeName(srcNode, c.Name), true, nil)
 	}
 
-	c.graph.AddNode("G", "Vision", tableNode("Vision", c.Vision, c.OKR.Trs()))
-
-	for _, group := range c.Groups {
-		group.WriteGraph(c.graph, "Vision")
+	for _, e := range c.ExternalProjects {
+		if proj := e.GetProject(); proj != nil {
+			c.Projects = append(c.Projects, proj)
+		}
 	}
-	fmt.Printf(c.graph.String())
+
+	for _, project := range c.Projects {
+		project.WriteGraph(g, nodeName(srcNode, c.Name))
+	}
+
+	for _, member := range c.Members {
+		member.WriteGraph(g, nodeName(srcNode, c.Name))
+	}
+}
+
+func NewProject(b []byte) *Project {
+	project := &Project{}
+
+	err := json.Unmarshal(b, project)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return project
 }

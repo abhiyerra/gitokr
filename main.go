@@ -1,21 +1,22 @@
 package main
 
 import (
-	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 	"regexp"
 	"strings"
+
+	"github.com/awalterschulze/gographviz"
 )
 
-func nodeName(input string) string {
+func nodeName(srcNode, input string) string {
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 	if err != nil {
 		log.Fatal(err)
 	}
-	return reg.ReplaceAllString(input, "")
+	return srcNode + strings.Replace(reg.ReplaceAllString(input, ""), "_", "", -1)
 }
 
 func tableNode(title, text string, tr []string) map[string]string {
@@ -34,15 +35,24 @@ func tableNode(title, text string, tr []string) map[string]string {
 	}
 }
 
+var (
+	githubAccessToken string
+)
+
 func main() {
-	project := &Project{}
+	flag.StringVar(&githubAccessToken, "github-access-token", "", "Github Access Token")
+	flag.Parse()
 
-	b, _ := ioutil.ReadFile(os.Args[1])
+	b, _ := ioutil.ReadFile(flag.Arg(0))
 
-	err := json.Unmarshal(b, project)
-	if err != nil {
-		log.Fatal(err)
+	project := NewProject(b)
+
+	g, _ := gographviz.Read([]byte(`digraph G {}`))
+	if err := g.SetName("G"); err != nil {
+		panic(err)
 	}
 
-	project.WriteGraph()
+	project.WriteGraph(g, "")
+
+	fmt.Printf(g.String())
 }
