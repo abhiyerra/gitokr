@@ -3,8 +3,8 @@ package main
 import "time"
 
 type KeyResult struct {
-	Metric      string
-	GithubIssue string
-	ReviewedAt  *time.Time
-	Done        bool
+	Metric      string     `yaml:"Metric"`
+	GithubIssue string     `yaml:"GithubIssue"`
+	ReviewedAt  *time.Time `yaml:"ReviewedAt"`
+	Done        bool       `yaml:"Done"`
 }

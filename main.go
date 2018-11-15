@@ -43,9 +43,15 @@ func main() {
 	flag.StringVar(&githubAccessToken, "github-access-token", "", "Github Access Token")
 	flag.Parse()
 
-	b, _ := ioutil.ReadFile(flag.Arg(0))
+	fileName := flag.Arg(0)
+	b, _ := ioutil.ReadFile(fileName)
 
-	project := NewProject(b)
+	var project *Project
+	if strings.HasSuffix(fileName, "yml") || strings.HasSuffix(fileName, "yaml") {
+		project = NewProjectFromYaml(b)
+	} else {
+		project = NewProject(b)
+	}
 
 	g, _ := gographviz.Read([]byte(`digraph G {}`))
 	if err := g.SetName("G"); err != nil {

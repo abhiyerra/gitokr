@@ -9,7 +9,6 @@ import (
 type OKRs map[string]*OKR
 
 func (o OKRs) Trs() (trs []string) {
-
 	for period, okr := range o {
 		f := fmt.Sprintf(`<tr><td colspan="2"><font>%s</font></td></tr>`, period)
 		f += fmt.Sprintf(`%s`, okr.Table())
@@ -21,8 +20,8 @@ func (o OKRs) Trs() (trs []string) {
 }
 
 type OKR struct {
-	Objective  string
-	KeyResults []KeyResult
+	Objective  string      `yaml:"Objective"`
+	KeyResults []KeyResult `yaml:"KeyResults"`
 }
 
 func (o OKR) NodeName() string {

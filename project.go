@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/awalterschulze/gographviz"
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -15,16 +16,16 @@ const (
 )
 
 type Project struct {
-	Name   string
-	Vision string
+	Name   string `yaml:"Name"`
+	Vision string `yaml:"Vision"`
 
-	Type string
+	Type string `yaml:"Type"`
 
-	OKR OKRs
+	OKR OKRs `yaml:"OKR"`
 
-	ExternalProjects []ExternalProject
-	Projects         []*Project
-	Members          []*Member
+	ExternalProjects []ExternalProject `yaml:"ExternalProjects"`
+	Projects         []*Project        `yaml:"Projects"`
+	Members          []*Member         `yaml:"Members"`
 }
 
 func (c *Project) NodeName() string {
@@ -62,6 +63,18 @@ func NewProject(b []byte) *Project {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	return project
+}
+
+func NewProjectFromYaml(b []byte) *Project {
+	project := &Project{}
+
+	err := yaml.Unmarshal(b, project)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(project)
 
 	return project
 }

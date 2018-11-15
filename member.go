@@ -7,8 +7,8 @@ import (
 )
 
 type Member struct {
-	Name string
-	OKR  OKRs
+	Name string `yaml:"Name"`
+	OKR  OKRs   `yaml:"OKR"`
 
 	// Cron
 }

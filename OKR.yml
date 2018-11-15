@@ -1,0 +1,21 @@
+---
+  Name: "GitOKR"
+  Vision: "Simple tool to manage OKRs using Github."
+  Projects:
+    - Name: "Product"
+      OKR:
+        Q4:
+          Objective: "Make it simple to use and have certain critical things that are part of OKRs."
+          KeyResults:
+            - Metric: "Has a mechanism to score OKRs."
+            - Metric: "Create Cron Tasks that are tasks that need to happen regularily."
+            - Metric: "Create Standard Operating Procedure Tasks. Merge GitSOP."
+    - Name: "Marketing"
+      OKR:
+        Q4:
+          Objective: "Get people to use it and expand on the use cases of the tool."
+          KeyResults:
+            - Metric: "Create examples directory"
+            - Metric: "Get 100 Stars"
+            - Metric: "Post it on 20 Sites"
+
