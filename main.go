@@ -39,6 +39,10 @@ var (
 	githubAccessToken string
 )
 
+func isYaml(fileName string) bool {
+	return strings.HasSuffix(fileName, "yml") || strings.HasSuffix(fileName, "yaml")
+}
+
 func main() {
 	flag.StringVar(&githubAccessToken, "github-access-token", "", "Github Access Token")
 	flag.Parse()
@@ -47,7 +51,7 @@ func main() {
 	b, _ := ioutil.ReadFile(fileName)
 
 	var project *Project
-	if strings.HasSuffix(fileName, "yml") || strings.HasSuffix(fileName, "yaml") {
+	if isYaml(fileName) {
 		project = NewProjectFromYaml(b)
 	} else {
 		project = NewProject(b)

@@ -23,9 +23,9 @@ type Project struct {
 
 	OKR OKRs `yaml:"OKR"`
 
-	ExternalProjects []ExternalProject `yaml:"ExternalProjects"`
-	Projects         []*Project        `yaml:"Projects"`
-	Members          []*Member         `yaml:"Members"`
+	ExternalProjects []*ExternalProject `yaml:"ExternalProjects"`
+	Projects         []*Project         `yaml:"Projects"`
+	Members          []*Member          `yaml:"Members"`
 }
 
 func (c *Project) NodeName() string {
