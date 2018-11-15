@@ -1,13 +1,5 @@
 package main
 
-import (
-	"context"
-	"log"
-
-	"github.com/google/go-github/github"
-	"golang.org/x/oauth2"
-)
-
 type ExternalProject struct {
 	Owner string `yaml:"Owner"`
 	Repo  string `yaml:"Repo"`
@@ -15,13 +7,7 @@ type ExternalProject struct {
 }
 
 func (c *ExternalProject) GetProject() *Project {
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: githubAccessToken},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-	githubClient := github.NewClient(tc)
-
+	ctx, githubClient := githubClient()
 	repoConfig, _, _, err := githubClient.Repositories.GetContents(ctx, c.Owner, c.Repo, c.Path, nil)
 	if err != nil {
 		return nil
@@ -32,9 +18,7 @@ func (c *ExternalProject) GetProject() *Project {
 		return nil
 	}
 
-	log.Println(c.Path)
 	if isYaml(c.Path) {
-		log.Println("yaml")
 		return NewProjectFromYaml([]byte(repoConfigContent))
 	}
 

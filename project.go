@@ -26,6 +26,9 @@ type Project struct {
 	ExternalProjects []*ExternalProject `yaml:"ExternalProjects"`
 	Projects         []*Project         `yaml:"Projects"`
 	Members          []*Member          `yaml:"Members"`
+	Crons            Crons              `yaml:"Crons"`
+
+	// Tasks []*Task `yaml:"Task"`
 }
 
 func (c *Project) NodeName() string {
@@ -56,6 +59,12 @@ func (c *Project) WriteGraph(g *gographviz.Graph, srcNode string) {
 	}
 }
 
+func (c *Project) RunCrons(srcNode string) {
+	for _, cron := range c.Crons {
+		cron.RunCron(nodeName(srcNode, c.Name))
+	}
+}
+
 func NewProject(b []byte) *Project {
 	project := &Project{}
 
@@ -74,7 +83,6 @@ func NewProjectFromYaml(b []byte) *Project {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(project)
 
 	return project
 }

@@ -9,6 +9,7 @@
           KeyResults:
             - Metric: "Has a mechanism to score OKRs."
             - Metric: "Create Cron Tasks that are tasks that need to happen regularily."
+              Done: true
             - Metric: "Create Standard Operating Procedure Tasks. Merge GitSOP."
     - Name: "Marketing"
       OKR:

@@ -10,7 +10,8 @@ type Member struct {
 	Name string `yaml:"Name"`
 	OKR  OKRs   `yaml:"OKR"`
 
-	// Cron
+	// Tasks []*Task `yaml:"Task"`
+	Crons []*Cron `yaml:"Cron"`
 }
 
 func (m *Member) WriteGraph(g *gographviz.Graph, srcNode string) {
