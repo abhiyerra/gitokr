@@ -26,7 +26,9 @@ func nodeName(srcNode, input string) string {
 	return srcNode + strings.Replace(reg.ReplaceAllString(input, ""), "_", "", -1)
 }
 
-func tableNode(title, text string, tr []string) map[string]string {
+func tableNode(title, text string, tr []string, labels map[string]string) (v map[string]string) {
+	v = make(map[string]string)
+
 	f := fmt.Sprintf(`<table border="0" cellspacing="0" cellborder="1">
     <tr>
      <td colspan="2" bgcolor="orange"><b>%s</b></td>
@@ -36,10 +38,16 @@ func tableNode(title, text string, tr []string) map[string]string {
      </tr>%s</table>
     `, title, text, strings.Join(tr, ""))
 
-	return map[string]string{
+	v = map[string]string{
 		"shape": "plaintext",
 		"label": "<" + f + ">",
 	}
+
+	for k, v2 := range labels {
+		v[k] = v2
+	}
+
+	return
 }
 
 var (

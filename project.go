@@ -27,8 +27,8 @@ type Project struct {
 	Projects         []*Project         `yaml:"Projects"`
 	Members          []*Member          `yaml:"Members"`
 	Crons            Crons              `yaml:"Crons"`
-
-	// Tasks []*Task `yaml:"Task"`
+	Tasks            Tasks              `yaml:"Tasks"`
+	SOPs             SOPs               `yaml:"SOPs"`
 }
 
 func (c *Project) NodeName() string {
@@ -39,7 +39,7 @@ func (c *Project) WriteGraph(g *gographviz.Graph, srcNode string) {
 	if c.Type == "" {
 		c.Type = DefaultProjectType
 	}
-	g.AddNode("G", nodeName(srcNode, c.Name), tableNode(c.NodeName(), c.Vision, c.OKR.Trs()))
+	g.AddNode("G", nodeName(srcNode, c.Name), tableNode(c.NodeName(), c.Vision, c.OKR.Trs(), nil))
 	if srcNode != "" {
 		g.AddEdge(srcNode, nodeName(srcNode, c.Name), true, nil)
 	}
@@ -56,6 +56,10 @@ func (c *Project) WriteGraph(g *gographviz.Graph, srcNode string) {
 
 	for _, member := range c.Members {
 		member.WriteGraph(g, nodeName(srcNode, c.Name))
+	}
+
+	for _, sop := range c.SOPs {
+		sop.WriteGraph(g, nodeName(srcNode, c.Name))
 	}
 }
 
