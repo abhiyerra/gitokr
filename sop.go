@@ -32,14 +32,12 @@ func (m *SOP) githubLink() string {
 }
 
 func (m *SOP) WriteGraph(g *gographviz.Graph, srcNode string) {
-	log.Println(m)
 	b, err := ioutil.ReadFile(m.File)
 	if err != nil {
 		log.Println(err)
 	}
 
 	m.fileContent = html.EscapeString(string(b))
-	log.Println(m.fileContent)
 
 	g.AddNode("G", nodeName(srcNode, m.Name), map[string]string{
 		"label": `"SOP: ` + m.Name + `"`,
