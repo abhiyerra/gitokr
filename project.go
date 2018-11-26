@@ -63,6 +63,38 @@ func (c *Project) WriteGraph(g *gographviz.Graph, srcNode string) {
 	}
 }
 
+type Score struct {
+	KeyResultsFinished float32
+	KeyResultsTotal    float32
+}
+
+func (c *Project) WriteScore() {
+	scores := c.Score(make(map[string]Score))
+
+	for k := range scores {
+		log.Printf("Score: %s - %0.2f%%", k, scores[k].KeyResultsFinished/scores[k].KeyResultsTotal*100)
+	}
+}
+
+func (c *Project) Score(scores map[string]Score) map[string]Score {
+	for okr := range c.OKR {
+		score := scores[okr]
+		for _, i := range c.OKR[okr].KeyResults {
+			if i.Done {
+				score.KeyResultsFinished += 1.0
+			}
+			score.KeyResultsTotal += 1.0
+		}
+		scores[okr] = score
+	}
+
+	for _, i := range c.Projects {
+		i.Score(scores)
+	}
+
+	return scores
+}
+
 func (c *Project) RunCrons(srcNode string) {
 	for _, cron := range c.Crons {
 		cron.RunCron(nodeName(srcNode, c.Name))

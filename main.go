@@ -76,7 +76,7 @@ func main() {
 	flag.StringVar(&githubAccessToken, "github-access-token", "", "Github Access Token")
 	flag.Parse()
 
-	log.SetFlags(log.Llongfile)
+	//log.SetFlags(log.Llongfile)
 
 	sess, _ := session.NewSession(&aws.Config{
 		Region:      aws.String("us-west-2"),
@@ -103,6 +103,7 @@ func main() {
 		project.RunCrons("")
 	} else {
 		project.WriteGraph(g, "")
+		project.WriteScore()
 		fmt.Printf(g.String())
 	}
 
