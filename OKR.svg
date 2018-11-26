@@ -34,7 +34,7 @@
 <polygon fill="none" stroke="#000000" points="8,-76 8,-142 85,-142 85,-76 8,-76"/>
 <text text-anchor="start" x="10.5293" y="-104.8" font-family="Times,serif" font-size="14.00" fill="#000000">Key Results:</text>
 <polygon fill="none" stroke="#000000" points="85,-76 85,-142 514,-142 514,-76 85,-76"/>
-<polygon fill="none" stroke="#ff0000" points="88,-119 88,-139 511,-139 511,-119 88,-119"/>
+<polygon fill="none" stroke="#00ff00" points="88,-119 88,-139 511,-139 511,-119 88,-119"/>
 <text text-anchor="start" x="91" y="-124.8" font-family="Times,serif" font-size="14.00" fill="#000000">Has a mechanism to score OKRs.</text>
 <polygon fill="none" stroke="#00ff00" points="88,-99 88,-119 511,-119 511,-99 88,-99"/>
 <text text-anchor="start" x="91" y="-104.8" font-family="Times,serif" font-size="14.00" fill="#000000">Create Cron Tasks that are tasks that need to happen regularily.</text>

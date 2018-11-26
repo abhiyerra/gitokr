@@ -8,6 +8,7 @@
           Objective: "Make it simple to use and have certain critical things that are part of OKRs."
           KeyResults:
             - Metric: "Has a mechanism to score OKRs."
+              Done: true
             - Metric: "Create Cron Tasks that are tasks that need to happen regularily."
               Done: true
             - Metric: "Create Standard Operating Procedure Tasks. Merge GitSOP."
