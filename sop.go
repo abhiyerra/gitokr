@@ -46,6 +46,7 @@ func (m *SOP) WriteGraph(g *gographviz.Graph, srcNode string) {
 		"URL":   `"` + m.githubLink() + `"`,
 	})
 	g.AddEdge(srcNode, nodeName(srcNode, m.Name), true, map[string]string{
+		"dir":   "both",
 		"style": `"dotted"`,
 	})
 }

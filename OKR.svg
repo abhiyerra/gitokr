@@ -38,7 +38,7 @@
 <text text-anchor="start" x="91" y="-124.8" font-family="Times,serif" font-size="14.00" fill="#000000">Has a mechanism to score OKRs.</text>
 <polygon fill="none" stroke="#00ff00" points="88,-99 88,-119 511,-119 511,-99 88,-99"/>
 <text text-anchor="start" x="91" y="-104.8" font-family="Times,serif" font-size="14.00" fill="#000000">Create Cron Tasks that are tasks that need to happen regularily.</text>
-<polygon fill="none" stroke="#ff0000" points="88,-79 88,-99 511,-99 511,-79 88,-79"/>
+<polygon fill="none" stroke="#00ff00" points="88,-79 88,-99 511,-99 511,-79 88,-79"/>
 <text text-anchor="start" x="91" y="-84.8" font-family="Times,serif" font-size="14.00" fill="#000000">Create Standard Operating Procedure Tasks. Merge GitSOP.</text>
 </g>
 <!-- GitOKR&#45;&gt;GitOKRProduct -->
@@ -88,7 +88,8 @@
 <!-- GitOKRMarketing&#45;&gt;GitOKRMarketingNewIssue -->
 <g id="edge3" class="edge">
 <title>GitOKRMarketing&#45;&gt;GitOKRMarketingNewIssue</title>
-<path fill="none" stroke="#000000" stroke-dasharray="1,5" d="M757,-71.667C757,-62.7502 757,-54.0676 757,-46.3751"/>
+<path fill="none" stroke="#000000" stroke-dasharray="1,5" d="M757,-61.6627C757,-56.3617 757,-51.2572 757,-46.5245"/>
+<polygon fill="#000000" stroke="#000000" points="753.5001,-61.667 757,-71.667 760.5001,-61.667 753.5001,-61.667"/>
 <polygon fill="#000000" stroke="#000000" points="760.5001,-46.2383 757,-36.2383 753.5001,-46.2384 760.5001,-46.2383"/>
 </g>
 </g>
