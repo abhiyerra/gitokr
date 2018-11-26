@@ -79,7 +79,7 @@
 <!-- GitOKRMarketingNewIssue -->
 <g id="node4" class="node">
 <title>GitOKRMarketingNewIssue</title>
-<g id="a_node4"><a xlink:href="https://github.com/abhiyerra/gitokr/issues/new?title=New+Issue&amp;body=%2BIssue%!A(MISSING)%!B(MISSING)NAME%!A(MISSING)%!A(MISSING)%2523%!B(MISSING)What%!B(MISSING)does%!B(MISSING)it%!B(MISSING)do%!F(MISSING)" xlink:title="SOP: New Issue">
+<g id="a_node4"><a xlink:href="https://github.com/abhiyerra/gitokr/issues/new?body=%23+Issue%3A+NAME%0A%0A%23%23+What+does+it+do%3F&amp;title=New+Issue" xlink:title="SOP: New Issue">
 <ellipse fill="none" stroke="#0000ff" cx="757" cy="-18" rx="68.1633" ry="18"/>
 <text text-anchor="middle" x="757" y="-13.8" font-family="Times,serif" font-size="14.00" fill="#000000">SOP: New Issue</text>
 </a>

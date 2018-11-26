@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/url"
+	"strings"
 
 	"github.com/awalterschulze/gographviz"
 )
@@ -28,7 +29,7 @@ func (m *SOP) githubLink() string {
 	v.Set("title", m.Name)
 	v.Set("body", m.fileContent)
 
-	return fmt.Sprintf("https://github.com/%s/%s/issues/new?", m.Github.Owner, m.Github.Repo) + v.Encode()
+	return fmt.Sprintf("https://github.com/%s/%s/issues/new?", m.Github.Owner, m.Github.Repo) + strings.Replace(strings.Replace(v.Encode(), "%", "%%", -1), "&", "&amp;", -1)
 }
 
 func (m *SOP) WriteGraph(g *gographviz.Graph, srcNode string) {
