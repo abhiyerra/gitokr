@@ -17,6 +17,7 @@ const (
 
 type Project struct {
 	Name   string `yaml:"Name"`
+	ID     string `yaml:"ID"`
 	Vision string `yaml:"Vision"`
 
 	Type string `yaml:"Type"`
@@ -29,6 +30,7 @@ type Project struct {
 	Crons            Crons              `yaml:"Crons"`
 	Tasks            Tasks              `yaml:"Tasks"`
 	SOPs             SOPs               `yaml:"SOPs"`
+	Links            Links              `yaml:"Links"`
 }
 
 func (c *Project) NodeName() string {
@@ -39,9 +41,15 @@ func (c *Project) WriteGraph(g *gographviz.Graph, srcNode string) {
 	if c.Type == "" {
 		c.Type = DefaultProjectType
 	}
-	g.AddNode("G", nodeName(srcNode, c.Name), tableNode(c.NodeName(), c.Vision, c.OKR.Trs(), nil))
+
+	currentNodeName := nodeName(srcNode, c.Name)
+	if c.ID != "" {
+		currentNodeName = c.ID
+	}
+
+	g.AddNode("G", currentNodeName, tableNode(c.NodeName(), c.Vision, c.OKR.Trs(), nil))
 	if srcNode != "" {
-		g.AddEdge(srcNode, nodeName(srcNode, c.Name), true, nil)
+		g.AddEdge(srcNode, currentNodeName, true, nil)
 	}
 
 	for _, e := range c.ExternalProjects {
@@ -51,15 +59,19 @@ func (c *Project) WriteGraph(g *gographviz.Graph, srcNode string) {
 	}
 
 	for _, project := range c.Projects {
-		project.WriteGraph(g, nodeName(srcNode, c.Name))
+		project.WriteGraph(g, currentNodeName)
 	}
 
 	for _, member := range c.Members {
-		member.WriteGraph(g, nodeName(srcNode, c.Name))
+		member.WriteGraph(g, currentNodeName)
 	}
 
 	for _, sop := range c.SOPs {
-		sop.WriteGraph(g, nodeName(srcNode, c.Name))
+		sop.WriteGraph(g, currentNodeName)
+	}
+
+	for _, link := range c.Links {
+		link.WriteGraph(g, currentNodeName)
 	}
 }
 

@@ -13,7 +13,10 @@
               Done: true
             - Metric: "Create Standard Operating Procedure Tasks. Merge GitSOP."
               Done: true
+      Links:
+        - ID: Marketing
     - Name: "Marketing"
+      ID: Marketing
       Crons:
         - Name: "Marketing"
           Schedule: "0 0 9 * * *"
