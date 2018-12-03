@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -12,8 +13,11 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/google/go-github/github"
 	"github.com/robfig/cron"
 )
@@ -26,11 +30,17 @@ type Cron struct {
 	Name     string `yaml:"Name"`
 	Schedule string `yaml:"Schedule"`
 
-	Files   []string          `yaml:"Files"`
-	Webhook string            `yaml:"Webhook"`
-	Inputs  map[string]string `yaml:"Inputs"`
+	Files  []string          `yaml:"Files"`
+	Inputs map[string]string `yaml:"Inputs"`
 
-	Github struct {
+	Type   string `yaml:"Type"`
+	Lambda struct {
+		FunctionName string `yaml:"FunctionName"`
+		Region       string `yaml:"Region"`
+	} `yaml:"Lambda"`
+
+	Webhook string `yaml:"Webhook"`
+	Github  struct {
 		Owner     string    `yaml:"Owner"`
 		Repo      string    `yaml:"Repo"`
 		Assignees *[]string `yaml:"Assignees"`
@@ -89,10 +99,15 @@ func (t *Cron) RunCron(srcName string) {
 			issueText = t.joinFiles()
 		)
 
-		if t.Webhook == "" {
+		switch t.Type {
+		case "Github":
 			t.newGithubIssue(issueText)
-		} else {
+		case "Webhook":
 			t.newWebhook(issueText)
+		case "Lambda":
+			t.newLambda(issueText)
+		default:
+			t.newGithubIssue(issueText)
 		}
 
 		t.cronRun.Task = tableKey
@@ -140,6 +155,39 @@ func (c *Cron) newWebhook(issueText string) {
 		log.Println(err)
 	}
 	defer resp.Body.Close()
+}
+
+func (c *Cron) newLambda(issueText string) {
+	sess := session.Must(session.NewSession())
+
+	svc := lambda.New(sess, &aws.Config{
+		Credentials: credentials.NewSharedCredentials("", awsProfile),
+		Region:      aws.String(c.Lambda.Region),
+	})
+
+	payload := struct {
+		IssueText string
+	}{
+		IssueText: issueText,
+	}
+
+	b, err := json.Marshal(payload)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	result, err := svc.Invoke(&lambda.InvokeInput{
+		FunctionName:   aws.String(c.Lambda.FunctionName),
+		InvocationType: aws.String("RequestResponse"),
+		LogType:        aws.String("Tail"),
+		Payload:        b,
+	})
+
+	if err != nil {
+		log.Println(err, string(result.Payload))
+		return
+	}
 }
 
 type Crons []*Cron

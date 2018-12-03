@@ -17,7 +17,7 @@
   version = "v2.0"
 
 [[projects]]
-  digest = "1:497c980ef231a6604b34f1125682be73c86b84bc5076bd28d9a42b98299b706d"
+  digest = "1:2fd92485194f7e92c30768f4d4fd67324500e4db32b20c7dfe29dc1a19ab6f79"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -49,14 +49,16 @@
     "private/protocol/query",
     "private/protocol/query/queryutil",
     "private/protocol/rest",
+    "private/protocol/restjson",
     "private/protocol/xml/xmlutil",
     "service/dynamodb",
     "service/dynamodb/dynamodbattribute",
+    "service/lambda",
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "66af558c91f83a793b4a0101f70742062982f611"
-  version = "v1.15.81"
+  revision = "ceab7b7ac6f535d1397f124620720b5145f1ad59"
+  version = "v1.15.88"
 
 [[projects]]
   digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
@@ -106,18 +108,18 @@
     "context/ctxhttp",
   ]
   pruneopts = "UT"
-  revision = "adae6a3d119ae4890b46832a2e88a95adc62b8e7"
+  revision = "351d144fa1fc0bd934e2408202be0c29f25e35a0"
 
 [[projects]]
   branch = "master"
-  digest = "1:0142ef85bbc356750e329654ef29734ff05bd70ec9d8c1f46e39a3e97683318f"
+  digest = "1:7bea7ba08178336c2c82ba215c8e101fe23fd2dc809dd38d4141640442149c2d"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
     "internal",
   ]
   pruneopts = "UT"
-  revision = "8f65e3013ebad444f13bc19536f7865efc793816"
+  revision = "28207608b83849a028d4f12e46533a6b6894ecaf"
 
 [[projects]]
   digest = "1:08206298775e5b462e6c0333f4471b44e63f1a70e42952b6ede4ecc9572281eb"
@@ -136,12 +138,12 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:342378ac4dcb378a5448dd723f0784ae519383532f5e70ade24132c4c8693202"
+  digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   pruneopts = "UT"
-  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
-  version = "v2.2.1"
+  revision = "51d6538a90f86fe93ac480b35f37b2be17fef232"
+  version = "v2.2.2"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -153,6 +155,7 @@
     "github.com/aws/aws-sdk-go/aws/session",
     "github.com/aws/aws-sdk-go/service/dynamodb",
     "github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute",
+    "github.com/aws/aws-sdk-go/service/lambda",
     "github.com/google/go-github/github",
     "github.com/robfig/cron",
     "golang.org/x/oauth2",
