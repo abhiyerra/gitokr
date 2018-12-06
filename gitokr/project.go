@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/awalterschulze/gographviz"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 const (
@@ -27,9 +27,6 @@ type Project struct {
 	ExternalProjects []*ExternalProject `yaml:"ExternalProjects"`
 	Projects         []*Project         `yaml:"Projects"`
 	Members          []*Member          `yaml:"Members"`
-	Crons            Crons              `yaml:"Crons"`
-	Tasks            Tasks              `yaml:"Tasks"`
-	SOPs             SOPs               `yaml:"SOPs"`
 	Links            Links              `yaml:"Links"`
 }
 
@@ -64,10 +61,6 @@ func (c *Project) WriteGraph(g *gographviz.Graph, srcNode string) {
 
 	for _, member := range c.Members {
 		member.WriteGraph(g, currentNodeName)
-	}
-
-	for _, sop := range c.SOPs {
-		sop.WriteGraph(g, currentNodeName)
 	}
 
 	for _, link := range c.Links {
@@ -105,12 +98,6 @@ func (c *Project) Score(scores map[string]Score) map[string]Score {
 	}
 
 	return scores
-}
-
-func (c *Project) RunCrons(srcNode string) {
-	for _, cron := range c.Crons {
-		cron.RunCron(nodeName(srcNode, c.Name))
-	}
 }
 
 func NewProject(b []byte) *Project {

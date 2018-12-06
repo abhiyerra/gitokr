@@ -20,7 +20,7 @@ var (
 )
 
 const (
-	configFile  = ".gitsop/config.json"
+	configFile  = "SOP.yaml"
 	dynamoTable = "GitSOP"
 )
 

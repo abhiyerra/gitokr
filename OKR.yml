@@ -2,7 +2,7 @@
   Name: "GitOKR"
   Vision: "Simple tool to manage OKRs using Github."
   Projects:
-    - Name: "Product"
+    - Name: "GitOKR"
       OKR:
         Q4:
           Objective: "Make it simple to use and have certain critical things that are part of OKRs."
@@ -13,25 +13,20 @@
               Done: true
             - Metric: "Create Standard Operating Procedure Tasks. Merge GitSOP."
               Done: true
-      Links:
-        - ID: Marketing
-    - Name: "Marketing"
-      ID: Marketing
-      Crons:
-        - Name: "Marketing"
-          Schedule: "0 0 9 * * *"
-          Github:
-            Owner: abhiyerra
-            Repo: gitokr
-            Assignees:
-              - "abhiyerra"
-          Files:
-            - "Docs/MARKETING.md"
+    - Name: "GitSOP"
       OKR:
         Q4:
-          Objective: "Get people to use it and expand on the use cases of the tool."
+          Objective: "Create Standard Operating Procedures"
           KeyResults:
             - Metric: "Create examples directory"
-            - Metric: "Get 100 Stars"
-            - Metric: "Post it on 20 Sites"
+            - Metric: "Create a method for launching SOP from a repo locally."
+            - Metric: "Call Github Issues / API / Lambda"
+    - Name: "GitCron"
+      OKR:
+        Q4:
+          Objective: "Create Standard Cron Tasks for Repo"
+          KeyResults:
+            - Metric: "Execute and Store Cron Task in DynamoDB"
+            - Metric: "Create Lambda to Watch and Run Tasks."
+            - Metric: "Call Github Issues / API / Lambda"
 

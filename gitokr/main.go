@@ -10,10 +10,6 @@ import (
 	"strings"
 
 	"github.com/awalterschulze/gographviz"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
@@ -52,9 +48,6 @@ func tableNode(title, text string, tr []string, labels map[string]string) (v map
 
 var (
 	githubAccessToken string
-	awsProfile        string
-	isCron            bool
-	dyno              *dynamodb.DynamoDB
 )
 
 func isYaml(fileName string) bool {
@@ -73,18 +66,10 @@ func githubClient() (ctx context.Context, githubClient *github.Client) {
 }
 
 func main() {
-	flag.BoolVar(&isCron, "cron", false, "Is it a cron task")
 	flag.StringVar(&githubAccessToken, "github-access-token", "", "Github Access Token")
-	flag.StringVar(&awsProfile, "aws-profile", "", "AWS Profile")
 	flag.Parse()
 
 	//log.SetFlags(log.Llongfile)
-
-	sess, _ := session.NewSession(&aws.Config{
-		Region:      aws.String("us-west-2"),
-		Credentials: credentials.NewSharedCredentials("", awsProfile),
-	})
-	dyno = dynamodb.New(sess)
 
 	fileName := flag.Arg(0)
 	b, _ := ioutil.ReadFile(fileName)
@@ -101,12 +86,7 @@ func main() {
 		panic(err)
 	}
 
-	if isCron {
-		project.RunCrons("")
-	} else {
-		project.WriteGraph(g, "")
-		project.WriteScore()
-		fmt.Printf(g.String())
-	}
-
+	project.WriteGraph(g, "")
+	project.WriteScore()
+	fmt.Printf(g.String())
 }

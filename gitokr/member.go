@@ -9,9 +9,6 @@ import (
 type Member struct {
 	Name string `yaml:"Name"`
 	OKR  OKRs   `yaml:"OKR"`
-
-	Crons Crons `yaml:"Cron"`
-	Tasks Tasks `yaml:"Task"`
 }
 
 func (m *Member) WriteGraph(g *gographviz.Graph, srcNode string) {
