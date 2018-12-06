@@ -29,4 +29,10 @@
             - Metric: "Execute and Store Cron Task in DynamoDB"
             - Metric: "Create Lambda to Watch and Run Tasks."
             - Metric: "Call Github Issues / API / Lambda"
+    - Name: "GitCanvas"
+      OKR:
+        Q4:
+          Objective: "Create Lean Canvas from Git"
+          KeyResults:
+            - Metric: "Generate Canvas from yaml and output to html."
 
