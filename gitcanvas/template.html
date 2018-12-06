@@ -1,0 +1,151 @@
+<html>
+
+<head>
+    <title>GitCanvas</title>
+
+    <style>
+        main {
+            margin: 20px 0 20px 0;
+            font-family: "roboto";
+        }
+
+        .column {
+            border: 1px solid #AAAAAA;
+            overflow: hidden;
+        }
+
+        .row-one .column {
+            min-height: 300px;
+        }
+
+        .row-two .column {
+            min-height: 150px;
+        }
+
+        hr.divider {
+            margin: 0 -20px;
+            border-top: 1px solid #AAAAAA
+        }
+
+        /* Typography */
+        h2.section-title {
+            font-size: 17px;
+            font-weight: 500;
+            color: #333333;
+        }
+
+        h3.sub-section-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        section p {
+            color: #666666;
+            font-weight: 300;
+        }
+
+        /* Equal Height Columns */
+
+        .row-eq-height {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Google Webfonts -->
+
+    <main>
+        <div id="content" class="container-fluid">
+            <!-- start Bootstrap Grid -->
+            <div class="row row-header section-container">
+                <div class="col-md-10 col-md-offset-1">
+                    <h1>Neondish Lean Canvas</h1>
+                </div>
+            </div>
+
+            <!-- Lean Canvas is 2 rows, with 5 columns. The bootstrap grid only contains 12 columns, which isn't evenly divisble by 5, so we will instead use 10 columns only, offsetting 2 of the columns. -->
+            <div class="row row-one section-container row-eq-height">
+                <!-- begin first row -->
+                <section class="column col-md-2 col-md-offset-1" id="problem">
+                    <h2 class="section-title">Problem</h2>
+                    <p>Founders of startups require lots of things to start, manage, and grow their company —
+                        Investors, Accelerators, Workspace, Lawyers, Accountants, etc. — yet there is no comprehensive
+                        resource for them to search and find these things.</p>
+                </section>
+
+                <div class="column col-md-2">
+                    <section class="top" id="solution">
+                        <h2 class="section-title">Solution</h2>
+                        <p>A web-based platform where entrepreneurs can go to find the resources, investors, and
+                            accelerators to start, run, and grow their business.</p>
+                        <p>Our core product matches companies with the accelerators and investors who are most likely
+                            to invest in their company, based on their thesis and historical investment data.</p>
+                    </section>
+                    <hr class="divider">
+                    </hr>
+                    <section class="bottom" id="key-metrics">
+                        <h2 class="section-title">Key Metrics</h2>
+                        <p>Amount of web traffic.</p>
+                        <p>Amount of user sign-ups.</p>
+                        <p>Amount of active users.</p>
+                        <p>Amount of emails on mailing list.</p>
+                    </section>
+                </div>
+
+                <section class="column col-md-2" id="unique-value-proposition">
+                    <h2 class="section-title">Unique Value Proposition</h2>
+                    <p>We save entrepreneurs the many hours of time spent searching for investors, accelerators, and
+                        resources by consolidating all of them into one comprehensive, easy to use platform.</p>
+                    <h3 class="sub-section-title">Competition</h3>
+                    <p>Alternatives = places where people can search through a database:</p>
+                    <p>CrunchBase - Investors, Accelerators<br>
+                        AngelList - Angels, Investors<br>
+                        PitchBook - Angels, Investors<br>
+                        F6S - Resources, Accelerators</p>
+                </section>
+
+                <div class="column col-md-2">
+                    <section class="" id="unfair-advantage">
+                        <h2 class="section-title">Unfair Advantage</h2>
+                        <p>This is our secret sauce.</p>
+                    </section>
+                    <hr class="divider">
+                    </hr>
+                    <section class="bottom" id="channels">
+                        <h2 class="section-title">Channels</h2>
+                        <p>Targeted content marketing.</p>
+                        <p>Partner with key connectors in each city's startup scene. (Ex. for Dallas - LaunchDFW, The
+                            DEC, Tech Wildcatters.)</p>
+                    </section>
+                </div>
+
+                <section class="column col-md-2" id="customer-segments">
+                    <h2 class="section-title">Customer Segments</h2>
+                    <p>Entrepreneurs who are fundraising.</p>
+                </section>
+
+            </div><!-- End first row -->
+
+            <div class="row row-two section-container row-eq-height">
+                <!-- Begin second row -->
+                <section class="column col-md-5 col-md-offset-1" id="cost-structure">
+                    <h2 class="section-title">Cost Structure</h2>
+                    <p>Server costs. Advertising/marketing (online and physical). </p>
+                </section>
+                <section class="column col-md-5" id="revenue-streams">
+                    <h2 class="section-title">Revenue Streams</h2>
+                    <p>Charge accelerator programs to target our audience through featured listings and email marketing
+                        campaigns.</p>
+                    <p>Charge service providers like Lawyers and Accountants for featured listings and email marketing
+                        campaigns.</p>
+                    <p>Sell minimal, beautiful display ads.</p>
+                </section>
+            </div> <!-- End second row -->
+        </div>
+    </main>
+</body>
+</html>
