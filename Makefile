@@ -9,6 +9,6 @@ release:
 
 build:
 		cd gitokr && dep ensure && go build -o gitokr && mv gitokr /bin/gitokr
-		cd gitcanvas && dep ensure &&  go build -o gitcanvas && mv gitcanvas /bin/gitcanvas
+		cd gitcanvas && dep ensure && go build -o gitcanvas && mv gitcanvas /bin/gitcanvas
 		# cd gitcron && dep ensure && go install
 		# cd gitsop && dep ensure && go install

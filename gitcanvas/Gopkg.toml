@@ -28,7 +28,3 @@
 [prune]
   go-tests = true
   unused-packages = true
-
-[[constraint]]
-  name = "github.com/jteeuwen/go-bindata"
-  version = "3.0.7"

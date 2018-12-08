@@ -2,16 +2,16 @@
 
 
 [[projects]]
-  digest = "1:0015060922f1b2e04469224e2ed82f0a67abbfee9a0a91852cf4980b91bf11d6"
-  name = "github.com/jteeuwen/go-bindata"
+  digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
+  name = "gopkg.in/yaml.v2"
   packages = ["."]
   pruneopts = "UT"
-  revision = "bbd0c6e271208dce66d8fda4bc536453cd27fc4a"
-  version = "v3.0.7"
+  revision = "51d6538a90f86fe93ac480b35f37b2be17fef232"
+  version = "v2.2.2"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/jteeuwen/go-bindata"]
+  input-imports = ["gopkg.in/yaml.v2"]
   solver-name = "gps-cdcl"
   solver-version = 1
