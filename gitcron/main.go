@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"strings"
@@ -20,9 +21,18 @@ import (
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/google/go-github/github"
 	"github.com/robfig/cron"
+	flag "github.com/spf13/pflag"
+)
+
+var (
+	githubAccessToken string
+
+	awsAccessKey       string
+	awsSecretAccessKey string
 )
 
 const (
+	configFile  = "SOP.yaml"
 	dynamoTable = "GitSOP"
 )
 
@@ -30,10 +40,8 @@ type Cron struct {
 	Name     string `yaml:"Name"`
 	Schedule string `yaml:"Schedule"`
 
-	Files  []string          `yaml:"Files"`
-	Inputs map[string]string `yaml:"Inputs"`
+	Files []string `yaml:"Files"`
 
-	Type   string `yaml:"Type"`
 	Lambda struct {
 		FunctionName string `yaml:"FunctionName"`
 		Region       string `yaml:"Region"`
@@ -50,6 +58,11 @@ type Cron struct {
 		Task    string
 		NextRun time.Time
 	}
+}
+
+type CronFile struct {
+	Project string
+	Cron    []*Cron
 }
 
 func (c *Cron) joinFiles() string {
@@ -201,4 +214,24 @@ func (o Crons) Table() (text string) {
 	text += fmt.Sprintf(`<tr><td>Cron:</td><td>%s</td></tr>`, text2)
 
 	return text
+}
+
+func main() {
+	flag.StringVar(&githubAccessToken, "github-access-token", "", "Github Access Token")
+	flag.Parse()
+
+	rand.Seed(time.Now().UTC().UnixNano())
+
+	sess, err := session.NewSession(&aws.Config{
+		Region:      aws.String("us-west-2"),
+		Credentials: credentials.NewSharedCredentials("", "opszero"),
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Create DynamoDB githubClient
+	svc := dynamodb.New(sess)
+
+	RunCron()
 }

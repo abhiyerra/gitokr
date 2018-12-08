@@ -1,0 +1,7 @@
+---
+Name: "GitOKR"
+Problem:
+  Validations:
+    - Key: "There are no tools that help run a company using simple command line tools."
+Solution:
+  - Key: "Write tools that help create vision, goals, and standard operating procedures."
