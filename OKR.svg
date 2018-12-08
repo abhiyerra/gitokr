@@ -121,7 +121,7 @@
 <polygon fill="none" stroke="#000000" points="1354,-24 1354,-50 1431,-50 1431,-24 1354,-24"/>
 <text text-anchor="start" x="1356.5293" y="-32.8" font-family="Times,serif" font-size="14.00" fill="#000000">Key Results:</text>
 <polygon fill="none" stroke="#000000" points="1431,-24 1431,-50 1710,-50 1710,-24 1431,-24"/>
-<polygon fill="none" stroke="#ff0000" points="1434,-27 1434,-47 1707,-47 1707,-27 1434,-27"/>
+<polygon fill="none" stroke="#00ff00" points="1434,-27 1434,-47 1707,-47 1707,-27 1434,-27"/>
 <text text-anchor="start" x="1436.7549" y="-32.8" font-family="Times,serif" font-size="14.00" fill="#000000">Generate Canvas from yaml and output to html.</text>
 </g>
 <!-- GitOKR&#45;&gt;GitOKRGitCanvas -->

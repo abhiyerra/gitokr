@@ -35,4 +35,5 @@
           Objective: "Create Lean Canvas from Git"
           KeyResults:
             - Metric: "Generate Canvas from yaml and output to html."
+              Done: true
 
