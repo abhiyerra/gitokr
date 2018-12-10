@@ -1,0 +1,17 @@
+---
+- Name: Social
+  Files:
+    - ./SOCIAL.md
+- Name: Marketing - SEO
+  Files:
+    - ./Marketing/CONTENT_PIPELINE.md
+- Name: Marketing - Webpage
+  Files:
+    - ./Marketing/WEBSITE.md
+- Name: Repo
+  Lambda:
+    - FunctionName: CreateGithubRepo
+      Profile: opszero
+  Playbooks:
+    - Name: Landing Page Template
+    - Name: Example Rails App
