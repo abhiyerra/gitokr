@@ -92,11 +92,11 @@
 <polygon fill="none" stroke="#000000" points="983,-4 983,-70 1060,-70 1060,-4 983,-4"/>
 <text text-anchor="start" x="985.5293" y="-32.8" font-family="Times,serif" font-size="14.00" fill="#000000">Key Results:</text>
 <polygon fill="none" stroke="#000000" points="1060,-4 1060,-70 1320,-70 1320,-4 1060,-4"/>
-<polygon fill="none" stroke="#ff0000" points="1063,-47 1063,-67 1317,-67 1317,-47 1063,-47"/>
+<polygon fill="none" stroke="#00ff00" points="1063,-47 1063,-67 1317,-67 1317,-47 1063,-47"/>
 <text text-anchor="start" x="1065.8047" y="-52.8" font-family="Times,serif" font-size="14.00" fill="#000000">Execute and Store Cron Task in DynamoDB</text>
-<polygon fill="none" stroke="#ff0000" points="1063,-27 1063,-47 1317,-47 1317,-27 1063,-27"/>
+<polygon fill="none" stroke="#00ff00" points="1063,-27 1063,-47 1317,-47 1317,-27 1063,-27"/>
 <text text-anchor="start" x="1066" y="-32.8" font-family="Times,serif" font-size="14.00" fill="#000000">Create Lambda to Watch and Run Tasks.</text>
-<polygon fill="none" stroke="#ff0000" points="1063,-7 1063,-27 1317,-27 1317,-7 1063,-7"/>
+<polygon fill="none" stroke="#00ff00" points="1063,-7 1063,-27 1317,-27 1317,-7 1063,-7"/>
 <text text-anchor="start" x="1066" y="-12.8" font-family="Times,serif" font-size="14.00" fill="#000000">Call Github Issues / API / Lambda</text>
 </g>
 <!-- GitOKR&#45;&gt;GitOKRGitCron -->

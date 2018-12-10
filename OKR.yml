@@ -27,8 +27,11 @@
           Objective: "Create Standard Cron Tasks for Repo"
           KeyResults:
             - Metric: "Execute and Store Cron Task in DynamoDB"
+              Done: true
             - Metric: "Create Lambda to Watch and Run Tasks."
+              Done: true
             - Metric: "Call Github Issues / API / Lambda"
+              Done: true
     - Name: "GitCanvas"
       OKR:
         Q4:
