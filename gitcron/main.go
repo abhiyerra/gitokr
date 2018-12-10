@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -22,17 +23,17 @@ import (
 	"github.com/google/go-github/github"
 	"github.com/robfig/cron"
 	flag "github.com/spf13/pflag"
+	"golang.org/x/oauth2"
+	"gopkg.in/yaml.v2"
 )
 
 var (
 	githubAccessToken string
-
-	awsAccessKey       string
-	awsSecretAccessKey string
+	awsProfile        string
 )
 
 const (
-	configFile  = "SOP.yaml"
+	configFile  = "CRON.yml"
 	dynamoTable = "GitSOP"
 )
 
@@ -40,7 +41,10 @@ type Cron struct {
 	Name     string `yaml:"Name"`
 	Schedule string `yaml:"Schedule"`
 
-	Files []string `yaml:"Files"`
+	Files  []string               `yaml:"Files"`
+	Inputs map[string]interface{} `yaml:"Inputs"`
+
+	Type string `yaml:"Type"`
 
 	Lambda struct {
 		FunctionName string `yaml:"FunctionName"`
@@ -60,10 +64,7 @@ type Cron struct {
 	}
 }
 
-type CronFile struct {
-	Project string
-	Cron    []*Cron
-}
+type Crons []*Cron
 
 func (c *Cron) joinFiles() string {
 	var issueText []string
@@ -87,8 +88,8 @@ func (c *Cron) joinFiles() string {
 	return strings.Join(issueText, "\n")
 }
 
-func (t *Cron) RunCron(srcName string) {
-	tableKey := nodeName(srcName, t.Name)
+func (t *Cron) RunCron() {
+	tableKey := t.Name
 
 	schedule, err := cron.Parse(t.Schedule)
 	if err != nil {
@@ -149,7 +150,12 @@ func (c *Cron) newGithubIssue(issueText string) {
 		Assignees: c.Github.Assignees,
 	}
 
-	ctx, githubClient := githubClient()
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: githubAccessToken},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	githubClient := github.NewClient(tc)
 
 	_, _, err := githubClient.Issues.Create(ctx, c.Github.Owner, c.Github.Repo, newIssue)
 	if err != nil {
@@ -203,21 +209,13 @@ func (c *Cron) newLambda(issueText string) {
 	}
 }
 
-type Crons []*Cron
-
-func (o Crons) Table() (text string) {
-	text2 := `<table border="0" cellspacing="0" cellborder="1">`
-	for _, t := range o {
-		text2 += fmt.Sprintf(`<tr><td align="left">%s</td></tr>`, t.Name)
-	}
-	text2 += "</table>"
-	text += fmt.Sprintf(`<tr><td>Cron:</td><td>%s</td></tr>`, text2)
-
-	return text
-}
+var (
+	dyno *dynamodb.DynamoDB
+)
 
 func main() {
 	flag.StringVar(&githubAccessToken, "github-access-token", "", "Github Access Token")
+	flag.StringVar(&awsProfile, "aws-profile", "", "AWS Profile")
 	flag.Parse()
 
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -231,7 +229,26 @@ func main() {
 		log.Fatal(err)
 	}
 	// Create DynamoDB githubClient
-	svc := dynamodb.New(sess)
+	dyno = dynamodb.New(sess)
 
-	RunCron()
+	log.Println(flag.Arg(0))
+	b, err := ioutil.ReadFile(flag.Arg(0))
+	if err != nil {
+		log.Println(err)
+	}
+
+	var crons Crons
+
+	log.Println(string(b))
+
+	err = yaml.Unmarshal(b, &crons)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println(crons)
+
+	for _, i := range crons {
+		i.RunCron()
+	}
 }
