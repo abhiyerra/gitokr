@@ -1,6 +1,6 @@
 ---
   Name: "GitOKR"
-  Vision: "Simple tool to manage OKRs using Github."
+  Vision: "Tool to manage and create tasks using Github for running and organizing companies."
   Projects:
     - Name: "GitOKR"
       OKR:

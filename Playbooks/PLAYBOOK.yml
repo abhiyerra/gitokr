@@ -1,0 +1,109 @@
+---
+- Name: Repo
+  Lambda:
+    - FunctionName: GithubRepoCreate
+- Name: Social
+  Content: |
+    \# Social Media
+
+    - [ ] Twitter
+    - [ ] LinkedIN
+    - [ ] Facebook
+    - [ ] Google Apps
+    - [ ] Pipedrive
+- Name: Marketing - Branding
+  Content: |
+    \# Content Pipeline
+
+    - [ ] Logo
+    - [ ] Icon
+
+- Name: Marketing - SEO
+  Content: |
+    \# Content Pipeline
+
+    - [ ] Content
+- Name: Marketing - Webpage
+  Content: |
+    \# Website
+
+    - [ ] Cloudflare
+    - [ ] Template
+    - [ ] Create S3 Bucket
+    - [ ] Https
+- Name: Vision
+  Content: |
+   \# Vision
+
+   - [ ] GitCanvas
+   - [ ] GitOKR
+
+- Name: Tasks
+  Content: |
+  \# Initial Tasks
+
+  - [ ] Create a Set of Initial Tasks
+
+- Name: Cron Tasks
+  Content: |
+  \# Cron Tasks
+
+  - [ ] Website Mainteinance
+  - [ ] Sales
+
+- Name: App
+  Content: |
+  \# App
+
+  - [ ] Copy Template
+  - [ ] Setup Kube Deployment
+
+- Name: Marketing/Sales - Persona
+  Content: |
+  \# Persona
+
+  - [ ] Define Persona
+  - [ ] Define Buyer Matrix
+
+- Name: Marketing - Locations
+  Content: |
+   \# Marketing Locations
+
+   - [ ] Figure out where your ideal clients live.
+
+- Name: Marketing - Blog/Newsletter
+  Content: |
+   \# Marketing Locations
+
+   - [ ] Blog
+   - [ ] Create List of Content for Blog
+   - [ ] Mailchimp
+
+- Name: Marketing - Ads
+  Content: |
+   \# Marketing Locations
+
+   - [ ] AdCampaign
+   - [ ] LandingPage
+
+   - [ ] Facebook
+   - [ ] Google
+   - [ ] Twitter
+   - [ ] LinkedIN
+
+# - Sales
+#   - Drip campaign
+#     - Setup email sender
+#     - Write campaign
+#   - Sales team/commission
+# - Product
+#   - Coding
+#   - Deployment/infra
+
+# Sales | Lead PipelineLead CleaningEmail WritingPartnerships
+# -- | --
+# Marketing | WebsiteBlog WritingLanding PagesAd WritingSocial Media PostingProofreading
+# Finance | Bookkeeping
+# Delivery | Code SecuritySupport TeamGithub Issue MainteinanceCustomer Development
+# Creation | opsZero (Deployment)
+

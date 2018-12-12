@@ -11,10 +11,12 @@ var (
 	githubAccessToken string
 )
 
-const (
-	configFile  = "SOP.yaml"
-	dynamoTable = "GitSOP"
-)
+type PlaybookJobs []*PlaybookJobs
+
+type PlaybookJob struct {
+	Name    string `yaml:"Name"`
+	Content string `yaml:"Content"`
+}
 
 func main() {
 	flag.StringVar(&githubAccessToken, "github-access-token", "", "Github Access Token")
@@ -22,6 +24,6 @@ func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	rcs = append(rcs, NewRepoConfig(i, svc))
-	go RunHTTP()
+	// Create a Graph
+	// Execute Each Event
 }
