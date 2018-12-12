@@ -12,11 +12,11 @@
 <!-- GitOKR -->
 <g id="node1" class="node">
 <title>GitOKR</title>
-<polygon fill="#ffa500" stroke="transparent" points="824,-200 824,-220 1074,-220 1074,-200 824,-200"/>
-<polygon fill="none" stroke="#000000" points="824,-200 824,-220 1074,-220 1074,-200 824,-200"/>
-<text text-anchor="start" x="901.7534" y="-206.8" font-family="Times,serif" font-weight="bold" font-size="14.00" fill="#000000">Project: GitOKR</text>
-<polygon fill="none" stroke="#000000" points="824,-180 824,-200 1074,-200 1074,-180 824,-180"/>
-<text text-anchor="start" x="826.6982" y="-185.8" font-family="Times,serif" font-size="14.00" fill="#000000">Simple tool to manage OKRs using Github.</text>
+<polygon fill="#ffa500" stroke="transparent" points="709,-200 709,-220 1190,-220 1190,-200 709,-200"/>
+<polygon fill="none" stroke="#000000" points="709,-200 709,-220 1190,-220 1190,-200 709,-200"/>
+<text text-anchor="start" x="902.2534" y="-206.8" font-family="Times,serif" font-weight="bold" font-size="14.00" fill="#000000">Project: GitOKR</text>
+<polygon fill="none" stroke="#000000" points="709,-180 709,-200 1190,-200 1190,-180 709,-180"/>
+<text text-anchor="start" x="711.5923" y="-185.8" font-family="Times,serif" font-size="14.00" fill="#000000">Tool to manage and create tasks using Github for running and organizing companies.</text>
 </g>
 <!-- GitOKRGitOKR -->
 <g id="node2" class="node">
@@ -44,8 +44,8 @@
 <!-- GitOKR&#45;&gt;GitOKRGitOKR -->
 <g id="edge1" class="edge">
 <title>GitOKR&#45;&gt;GitOKRGitOKR</title>
-<path fill="none" stroke="#000000" d="M815.6371,-184.6941C735.8852,-174.6235 632.4369,-159.9573 532.0679,-140.1698"/>
-<polygon fill="#000000" stroke="#000000" points="532.5433,-136.6958 522.0524,-138.1759 531.1766,-143.5611 532.5433,-136.6958"/>
+<path fill="none" stroke="#000000" d="M749.6888,-175.9891C683.0496,-166.7961 608.2997,-155.2257 531.868,-140.132"/>
+<polygon fill="#000000" stroke="#000000" points="532.5436,-136.6979 522.0524,-138.1759 531.1755,-143.5629 532.5436,-136.6979"/>
 </g>
 <!-- GitOKRGitSOP -->
 <g id="node3" class="node">
@@ -127,7 +127,7 @@
 <!-- GitOKR&#45;&gt;GitOKRGitCanvas -->
 <g id="edge4" class="edge">
 <title>GitOKR&#45;&gt;GitOKRGitCanvas</title>
-<path fill="none" stroke="#000000" d="M1082.259,-185.7872C1157.7162,-176.1513 1253.4353,-161.2517 1337,-140 1355.6384,-135.26 1374.9973,-129.4465 1393.9627,-123.2147"/>
+<path fill="none" stroke="#000000" d="M1152.609,-175.9918C1212.488,-166.925 1277.7946,-155.0568 1337,-140 1355.6384,-135.26 1374.9973,-129.4465 1393.9627,-123.2147"/>
 <polygon fill="#000000" stroke="#000000" points="1395.1563,-126.5062 1403.5363,-120.0235 1392.9426,-119.8655 1395.1563,-126.5062"/>
 </g>
 </g>

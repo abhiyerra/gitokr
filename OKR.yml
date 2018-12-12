@@ -13,7 +13,7 @@
               Done: true
             - Metric: "Create Standard Operating Procedure Tasks. Merge GitSOP."
               Done: true
-    - Name: "GitSOP"
+    - Name: "GitPlaybook"
       OKR:
         Q4:
           Objective: "Create Standard Operating Procedures"

@@ -91,19 +91,36 @@
    - [ ] Twitter
    - [ ] LinkedIN
 
-# - Sales
-#   - Drip campaign
-#     - Setup email sender
-#     - Write campaign
-#   - Sales team/commission
-# - Product
-#   - Coding
-#   - Deployment/infra
+- Name: Sales - Initial Leads
+  Content: |
+    \# Leads
 
-# Sales | Lead PipelineLead CleaningEmail WritingPartnerships
-# -- | --
-# Marketing | WebsiteBlog WritingLanding PagesAd WritingSocial Media PostingProofreading
-# Finance | Bookkeeping
-# Delivery | Code SecuritySupport TeamGithub Issue MainteinanceCustomer Development
-# Creation | opsZero (Deployment)
+- Name: Sales - Lead Pipeline
+  Content: |
+    \# Lead Pipeline
 
+- Name: Sales - Partnerships
+  Content: |
+    \# Partnerships
+
+- Name: Finance - Bookkeeping
+  Content: |
+    \# Bookkeeping
+
+- Name: Delivery - Customer Support
+  Content: |
+    \# Customer Support
+
+    - [ ] Make Cron
+
+- Name: Creation - Coding
+  Content: |
+    \# Coding
+
+    - [ ] Tasks
+
+- Name: Creation - Infrastructure
+  Content: |
+    \# Infrastructure
+
+    - [ ] Tasks

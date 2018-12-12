@@ -1,6 +1,7 @@
 # gitokr
 
-Tools to help manage your business using Git.
+GitOKR lets you define the high level vision and create playbook of tasks to
+run businesses and other ventures through Git and Github.
 
  - [Example](https://github.com/abhiyerra/gitokr/blob/master/OKR.yml)
  - `brew install graphviz`
@@ -10,16 +11,18 @@ Tools to help manage your business using Git.
 
 ## Usage
 
-Canvas -> OKRs -> SOPs / Crons
-
 ### GitCanvas
 
 Lean Startup Business Model Canvas
 
-### OKRs
+### GitOKR
 
 Setup team and project OKRs
 
-### SOPs / Crons
+### GitCron
 
-Setup processes for standard operating procedures.
+Setup processes for repeating standard operating procedures.
+
+### GitPlaybook
+
+Create multiple Github Issues / Calls to Lambda via the playbook.
