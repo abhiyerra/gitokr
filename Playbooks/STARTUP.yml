@@ -1,10 +1,14 @@
 ---
-- Name: Repo
-  Lambda:
-    - FunctionName: GithubRepoCreate
+- Name: Vision
+  Content: |
+   # Vision
+
+   - [ ] GitCanvas
+   - [ ] GitOKR
+
 - Name: Social
   Content: |
-    \# Social Media
+    # Social Media
 
     - [ ] Twitter
     - [ ] LinkedIN
@@ -13,67 +17,61 @@
     - [ ] Pipedrive
 - Name: Marketing - Branding
   Content: |
-    \# Content Pipeline
+    # Content Pipeline
 
     - [ ] Logo
     - [ ] Icon
 
 - Name: Marketing - SEO
   Content: |
-    \# Content Pipeline
+    # Content Pipeline
 
     - [ ] Content
 - Name: Marketing - Webpage
   Content: |
-    \# Website
+    # Website
 
     - [ ] Cloudflare
     - [ ] Template
     - [ ] Create S3 Bucket
     - [ ] Https
-- Name: Vision
-  Content: |
-   \# Vision
-
-   - [ ] GitCanvas
-   - [ ] GitOKR
 
 - Name: Tasks
   Content: |
-  \# Initial Tasks
+   # Initial Tasks
 
-  - [ ] Create a Set of Initial Tasks
+   - [ ] Create a Set of Initial Tasks
 
 - Name: Cron Tasks
   Content: |
-  \# Cron Tasks
+   # Cron Tasks
 
-  - [ ] Website Mainteinance
-  - [ ] Sales
+   - [ ] Website Mainteinance
+   - [ ] Sales
 
 - Name: App
   Content: |
-  \# App
+   # App
 
-  - [ ] Copy Template
-  - [ ] Setup Kube Deployment
+   - [ ] Copy Template
+   - [ ] Setup Kube Deployment
 
 - Name: Marketing/Sales - Persona
   Content: |
-  \# Persona
+   # Persona
 
-  - [ ] Define Persona
-  - [ ] Define Buyer Matrix
+   - [ ] Define Persona
+   - [ ] Define Buyer Matrix
 
 - Name: Marketing - Locations
   Content: |
-   \# Marketing Locations
+   # Marketing Locations
 
    - [ ] Figure out where your ideal clients live.
 
 - Name: Marketing - Blog/Newsletter
   Content: |
-   \# Marketing Locations
+   # Marketing Locations
 
    - [ ] Blog
    - [ ] Create List of Content for Blog
@@ -81,7 +79,7 @@
 
 - Name: Marketing - Ads
   Content: |
-   \# Marketing Locations
+   # Marketing Locations
 
    - [ ] AdCampaign
    - [ ] LandingPage
@@ -93,34 +91,34 @@
 
 - Name: Sales - Initial Leads
   Content: |
-    \# Leads
+    # Leads
 
 - Name: Sales - Lead Pipeline
   Content: |
-    \# Lead Pipeline
+    # Lead Pipeline
 
 - Name: Sales - Partnerships
   Content: |
-    \# Partnerships
+    # Partnerships
 
 - Name: Finance - Bookkeeping
   Content: |
-    \# Bookkeeping
+    # Bookkeeping
 
 - Name: Delivery - Customer Support
   Content: |
-    \# Customer Support
+    # Customer Support
 
     - [ ] Make Cron
 
 - Name: Creation - Coding
   Content: |
-    \# Coding
+    # Coding
 
     - [ ] Tasks
 
 - Name: Creation - Infrastructure
   Content: |
-    \# Infrastructure
+    # Infrastructure
 
     - [ ] Tasks
