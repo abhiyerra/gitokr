@@ -11,4 +11,4 @@ build:
 		cd gitokr && dep ensure && go build -o gitokr && mv gitokr /bin/gitokr
 		cd gitcanvas && dep ensure && go build -o gitcanvas && mv gitcanvas /bin/gitcanvas
 		cd gitcron && dep ensure &&  go build -o gitcron && mv gitcron /bin/gitcron
-		cd gitplaybook && dep ensure && go build -o gitplaybook && mv gitplaybook /bin/gitplaybook
+		# cd gitsop && dep ensure && go install

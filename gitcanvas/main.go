@@ -11,7 +11,7 @@ import (
 
 type Validation struct {
 	Key       string `yaml:"Key"`
-	Validated bool   `yaml:"Validated"`
+	Validated string `yaml:"Validated"`
 	Learning  string `yaml:"Learning"`
 	Link      string `yaml;"Link"`
 }
@@ -21,7 +21,18 @@ type Validations []Validation
 func (v Validations) HTML() (t string) {
 	t += "<ul>"
 	for _, i := range v {
-		t += fmt.Sprintf("<li>%s</li>", i.Key)
+
+		color := "green"
+
+		switch i.Validated {
+		case "-1":
+			color = "red"
+		case "1":
+			color = "green"
+		default:
+			color = "orange"
+		}
+		t += fmt.Sprintf(`<li style="color: %s">%s</li>`, color, i.Key)
 	}
 
 	t += "</ul>"

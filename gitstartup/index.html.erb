@@ -1,0 +1,79 @@
+<h1><%= @startup.name %></h1>
+
+<div class="row">
+  <div class="col embed-responsive  embed-responsive-1by1">
+    <h2>Lean Canvas</h2>
+
+    <iframe class="embed-responsive-item" src="data:text/html;base64,<%= @startup.lean_canvas -%>" allowfullscreen></iframe>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col">
+    <h2>OKRs</h2>
+    <%= image_tag "data:image/svg;base64,#{@startup.okr}", class: "img-fluid" %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <h2>SOPs</h2>
+    <%#= @startup.okr %>
+  </div>
+
+  <div class="col">
+    <h2>Scheduled Tasks</h2>
+    <%= @startup.crons %>
+  </div>
+
+</div>
+
+
+<div class="row">
+  <div class="col">
+    <h2>Tasks</h2>
+    <%= @startup.tasks %>
+  </div>
+</div>
+
+  def lean_canvas
+    file = Tempfile.new(['okr', '.yml'])
+    svg = Tempfile.new(['okr', '.html'])
+    file.write(get_content("LEAN_CANVAS.yml"))
+    puts file.rewind
+    puts file.read
+    puts `gitcanvas #{file.path} > #{svg.path}`
+    svg.rewind
+    return Base64.strict_encode64(svg.read)
+  rescue
+    ""
+  end
+
+  def okr
+    file = Tempfile.new(['okr', '.yml'])
+    svg = Tempfile.new(['okr', '.svg'])
+    file.write(get_content("OKR.yml"))
+    puts file.rewind
+    puts file.read
+    `gitokr #{file.path} |  dot -Tpng > #{svg.path}`
+    svg.rewind
+    return Base64.strict_encode64(svg.read)
+  rescue
+    Rails.logger.error("No OKR for #{self.repo}")
+    return ""
+  end
+
+  def sops
+    get_content("SOP.yml") rescue ""
+  end
+
+  def crons
+    get_content("CRON.yml") rescue ""
+  end
+
+    def get_content(path)
+    client = Octokit::Client.new(:access_token => "")
+
+    Base64.decode64(client.contents(self.repo, :path => path).content)
+  end
