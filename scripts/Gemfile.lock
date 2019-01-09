@@ -1,0 +1,31 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    addressable (2.5.2)
+      public_suffix (>= 2.0.2, < 4.0)
+    commonmarker (0.18.2)
+      ruby-enum (~> 0.5)
+    concurrent-ruby (1.1.4)
+    faraday (0.15.4)
+      multipart-post (>= 1.2, < 3)
+    i18n (1.5.1)
+      concurrent-ruby (~> 1.0)
+    multipart-post (2.0.0)
+    octokit (4.13.0)
+      sawyer (~> 0.8.0, >= 0.5.3)
+    public_suffix (3.0.3)
+    ruby-enum (0.7.2)
+      i18n
+    sawyer (0.8.1)
+      addressable (>= 2.3.5, < 2.6)
+      faraday (~> 0.8, < 1.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  commonmarker
+  octokit
+
+BUNDLED WITH
+   1.16.6

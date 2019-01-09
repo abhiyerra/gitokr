@@ -31,8 +31,8 @@
   Content: |
     # Website
 
+    - [ ] Wesbite Template
     - [ ] Cloudflare
-    - [ ] Template
     - [ ] Create S3 Bucket
     - [ ] Https
 
