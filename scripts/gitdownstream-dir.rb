@@ -17,8 +17,7 @@ Dir.mktmpdir do |dest_dir|
   puts `git clone #{clone_url} #{dest_dir}`
   puts `cd #{dest_dir} && git checkout -b gitdownstrem-#{Time.now.to_i}`
   puts `rsync -a #{src_dir}/ #{dest_dir}/#{dest_path}`
-  puts `cd #{dest_dir} && git remote add origin #{clone_url}`
   puts `cd #{dest_dir} && git add .`
-  puts `cd #{dest_dir} && git commit -m "initial commit"`
-  puts `cd #{dest_dir} && git push --set-upstream origin master`
+  puts `cd #{dest_dir} && git commit -m "Merge Upstream"`
+  puts `cd #{dest_dir} && git push origin`
 end
