@@ -16,7 +16,7 @@ clone_url = new_repo[:clone_url]
 Dir.mktmpdir do |dest_dir|
   puts `git clone #{clone_url} #{dest_dir}`
   puts `cd #{dest_dir} && git checkout -b gitdownstrem-#{Time.now.to_i}`
-  puts `rsync -a #{src_dir}/ #{dest_dir}/#{dest_path}`
+  puts `rsync -a --delete #{src_dir}/ #{dest_dir}/#{dest_path}`
   puts `cd #{dest_dir} && git add .`
   puts `cd #{dest_dir} && git commit -m "Merge Upstream"`
   puts `cd #{dest_dir} && git push origin`
