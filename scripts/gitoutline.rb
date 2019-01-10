@@ -12,11 +12,24 @@ doc.walk do |node|
   if node.type == :header and node.header_level == 1
     header = node.to_plaintext.strip
     n = node.next
-    n.walk.each { |subnode| outline[header] += subnode.to_commonmark } if n
+    outline[header] = n.walk.map do |subnode|
+      if subnode.type == :list || subnode.type == :list_item
+        ""
+      else
+        subnode.string_content rescue "\n"
+      end
+    end.join if n
   end
 end
 
 client = Octokit::Client.new(:access_token => ENV["GITHUB_AUTH_TOKEN"])
+
+existing_issues = client.list_issues(repo)
 outline.each do |k, v|
-  client.create_issue(repo, k, v)
+  existing = existing_issues.select { |i| i.title == k }.first
+  if existing
+    client.update_issue(repo, existing.number, k, v)
+  else
+    client.create_issue(repo, k, v)
+  end
 end
