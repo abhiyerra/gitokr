@@ -15,9 +15,9 @@ new_repo = nil
 
 begin
   new_repo = client.repository(dest_repo)
-rescue Octokit::UnprocessableEntity
+rescue Octokit::UnprocessableEntity, Octokit::NotFound
   is_new_repo = true
-  new_repo = client.create_repository(dest_repo, {
+  new_repo = client.create_repository(dest_repo.split('/')[1], {
     :homepage => "https://paper.dropbox.com/doc/Coding-Guide--AVRNhdoQFtz012lQFoOuqZ_gAg-aDM0OWpacNt0UTGFfuRCr",
     :description => "Look at the Issues for what needs to be done, look at the link for coding guide",
     :private => true,
